@@ -7,6 +7,9 @@ local DataSettings = {
 	["Scope"] = "PlayerData"; --Player's DataStore folder name (a folder with this name will appear under each Player).
 	["Key"] = "Player_"; --prefix for key. Example: "Player_" is used for "Player_123456".
 	
+	--[FEATURES]--
+	["AutoSave"] = true; --set to true to enable auto saving.
+	["SaveTime"] = 1; --time (in minutes) how often it should automatically save.
 }
 
 --[[
@@ -162,6 +165,53 @@ local function onPlayerEntered(Player)
 			Player:Kick("Internal server error, please rejoin.")
 		end
 	end
+	
+	if DataSettings.AutoSave then
+		local isInGame = true
+		local plrRemove = nil
+		if DataSettings.SaveTime < 1 then
+			DataSettings.SaveTime = 1
+		end
+
+		plrRemove = Players.PlayerRemoving:Connect(function(plr)
+			if plr == Player then
+				isInGame = false
+			end
+		end)
+
+		while Player and isInGame == true do
+			task.wait(DataSettings.SaveTime * 60)
+			local PlayerData = Player:FindFirstChild(fileName)
+			local serialize = saveModule:CompileDataTable(PlayerData)
+			local dataCache = HttpService:JSONEncode(serialize)
+			local success, result = pcall(function()
+				PlayerDataStore:UpdateAsync(PlayerKey, function(oldValue)
+					local newValue = serialize or oldValue
+					return newValue
+				end)
+			end)
+
+			if success then
+				print(Player.Name .. " autosaved successfully.")
+				local maxCache = 4000000 --official limit is 4,000,000 as of February 2022
+				print(Player.Name .. " saved: ")
+				print(PlayerData.Name, serialize)
+				if #dataCache <= maxCache then
+					print("Cache: " .. #dataCache .. " /" .. maxCache)
+				else
+					warn("Cache exceeds limit: " .. #dataCache .. " /" .. maxCache)
+				end
+				print(#PlayerData:GetDescendants() .. " objects saved.")
+				print("Key: " .. PlayerKey)
+			else
+				warn(result)
+			end
+		end
+
+		if plrRemove and plrRemove.Connected then
+			plrRemove:Disconnect()
+		end
+	end
 end
 
 --player removing
@@ -188,7 +238,7 @@ local function onPlayerRemoving(Player)
 				warn("Cache exceeds limit: " .. #dataCache .. " /" .. maxCache)
 			end
 			print(#PlayerData:GetDescendants() .. " objects saved.")
-			print("Key: " .. DataSettings.Key .. Player.UserId)
+			print("Key: " .. PlayerKey)
 		else
 			warn(Player.UserId .. " | " .. Player.Name .. " did not save!", result)
 		end
