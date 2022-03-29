@@ -27,3 +27,6 @@ For setting up player data.
 - To save a script, a copy of it with the same name and sourceId must be present within ServerStorage.
 - To save a MeshPart or SurfaceAppearance, a copy of it must be present within ServerStorage.
 - Deprecated objects are not fully supported, but there may be some that are superseded carrying the same type. (i.e. Hat is superseded by Accessory, both are Accoutrements.)
+
+# Repositories
+JozeniDS Legacy: https://github.com/DragencryptedSE/JozeniDS-Legacy
