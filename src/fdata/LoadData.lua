@@ -1,4 +1,5 @@
 --[Made by Jozeni00]--
+local HttpService = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
 local RunService = game:GetService("RunService")
 
@@ -92,7 +93,7 @@ local function propTable(prop)
 			local props = {}
 			for i, v in pairs(prop) do
 				if type(v) == "string" then
-					table.insert(props, Enum.NormalId[v])	
+					table.insert(props, Enum.NormalId[v])
 				end
 			end
 			Data = Axes.new(table.unpack(props))
@@ -100,7 +101,7 @@ local function propTable(prop)
 			local props = {}
 			for i, v in pairs(prop) do
 				if type(v) == "string" then
-					table.insert(props, Enum.NormalId[v])	
+					table.insert(props, Enum.NormalId[v])
 				end
 			end
 			Data = Faces.new(table.unpack(props))
@@ -114,7 +115,7 @@ local function setReference(newObj, parent, info, prop)
 		if not parent.Parent then
 			parent:GetPropertyChangedSignal("Parent"):Wait()
 		end
-		
+
 		--find highest parented instance
 		local highestParent = parent
 		repeat
@@ -122,13 +123,13 @@ local function setReference(newObj, parent, info, prop)
 				highestParent = highestParent.Parent
 			end
 		until highestParent.Parent == nil
-		
+
 		--split the location
 		local splitLocations = info.Location:split(".")
 		local lastParent = nil
 		local startPos = 2
 		local foundPos = false
-		
+
 		--uncover real location
 		for i, v in pairs(splitLocations) do
 			if v == highestParent.Name then
@@ -137,7 +138,7 @@ local function setReference(newObj, parent, info, prop)
 				break
 			end
 		end
-		
+
 		--find the location of reference
 		if foundPos then
 			for i, v in pairs(splitLocations) do
@@ -156,7 +157,7 @@ local function setReference(newObj, parent, info, prop)
 				end
 			end
 		end
-		
+
 		--check if classname was not found
 		if lastParent.ClassName ~= info.ClassName then
 			local foundObj = false
@@ -171,17 +172,17 @@ local function setReference(newObj, parent, info, prop)
 					end
 				end
 			end
-			
+
 			if not foundObj then
 				local higherObj = lastParent.Parent
 				local AddedChild = nil
-				
+
 				AddedChild = higherObj.ChildAdded:Connect(function(child)
 					if foundObj then
 						AddedChild:Disconnect()
 						return
 					end
-					
+
 					if child:IsA(info.ClassName) then
 						if child.Name == splitLocations[#splitLocations] then
 							lastParent = child
@@ -189,24 +190,42 @@ local function setReference(newObj, parent, info, prop)
 						end
 					end
 				end)
-				
+
 				repeat
 					RunService.Heartbeat:Wait()
 				until foundObj == true
-				
+
 				if AddedChild and AddedChild.Connected then
 					AddedChild:Disconnect()
 				end
 			end
 		end
-		
+
 		--set reference
 		newObj[prop] = lastParent
 	end)
-	
+
 	if info then
 		scanForReference()
 	end
+end
+
+local function checkForObject(parent, info)
+	local foundObj = nil
+	local aName = "DataUniqueKeyId"
+	for i, v in pairs(parent:GetChildren()) do
+		if v.ClassName == info.ClassName then
+			local uniqueId = v:GetAttribute(aName)
+			if uniqueId and uniqueId == info.Attributes[aName] then
+				foundObj = v
+				break
+			end
+		end
+	end
+	if not foundObj then
+		foundObj = Instance.new(info.ClassName)
+	end
+	return foundObj
 end
 
 function DataSettings:Load(Player, DataTable, fileName)
@@ -216,7 +235,7 @@ function DataSettings:Load(Player, DataTable, fileName)
 			if data then
 				for key, info in pairs(data) do
 					--print(info)
-					local newObj = Instance.new(info.ClassName)
+					local newObj = checkForObject(parent, info)
 					newObj.Archivable = info.Archivable
 					newObj.Name = info.Name
 					setAttributes(newObj, info)
@@ -731,7 +750,7 @@ function DataSettings:Load(Player, DataTable, fileName)
 							newObj.Value = propTable(info.Value)
 						elseif newObj:IsA("ObjectValue") then
 							if info.Value then
-								scanObjects(newObj, info.Value, nil, true)	
+								scanObjects(newObj, info.Value, nil, true)
 							end
 							--print(newObj.Name .. " is a ValueBase.")
 						else
@@ -1001,6 +1020,23 @@ function DataSettings:Load(Player, DataTable, fileName)
 							newObj.ZIndex = info.ZIndex
 							if newObj:IsA("Frame") then
 								newObj.Style = Enum.FrameStyle[info.Style]
+							elseif newObj:IsA("ScrollingFrame") then
+								newObj.AutomaticCanvasSize = Enum.AutomaticSize[info.AutomaticCanvasSize]
+								newObj.BottomImage = info.BottomImage
+								newObj.CanvasPosition = propTable(info.CanvasPosition)
+								newObj.CanvasSize = propTable(info.CanvasSize)
+								newObj.ElasticBehavior = Enum.ElasticBehavior[info.ElasticBehavior]
+								newObj.HorizontalScrollBarInset = Enum.ScrollBarInset[info.HorizontalScrollBarInset]
+								newObj.MidImage = info.MidImage
+								newObj.ScrollBarImageColor3 = propTable(info.ScrollBarImageColor3)
+								newObj.ScrollBarImageTransparency = info.ScrollBarImageTransparency
+								newObj.ScrollBarThickness = info.ScrollBarThickness
+								newObj.ScrollVelocity = propTable(info.ScrollVelocity)
+								newObj.ScrollingDirection = Enum.ScrollingDirection[info.ScrollingDirection]
+								newObj.ScrollingEnabled = info.ScrollingEnabled
+								newObj.TopImage = info.TopImage
+								newObj.VerticalScrollBarInset = Enum.ScrollBarInset[info.VerticalScrollBarInset]
+								newObj.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition[info.VerticalScrollBarPosition]
 							elseif newObj:IsA("TextLabel") or newObj:IsA("TextButton") then
 								newObj.Font = Enum.Font[info.Font]
 								newObj.LineHeight = info.LineHeight
@@ -1202,7 +1238,7 @@ function DataSettings:Load(Player, DataTable, fileName)
 					if info.Children then
 						scanObjects(newObj, info.Children, isPrimaryPart)
 					end
-					
+
 					if objVal then
 						newObj.Parent = TempFile
 						if parent:IsA("ObjectValue") then
@@ -1211,7 +1247,7 @@ function DataSettings:Load(Player, DataTable, fileName)
 					else
 						newObj.Parent = parent
 					end
-					
+
 					if parent:IsA("Model") then
 						if primarypart and type(primarypart) == "string" and newObj.Name == primarypart then
 							if parent.Name == info.Parent then
@@ -1222,7 +1258,7 @@ function DataSettings:Load(Player, DataTable, fileName)
 				end
 			end
 		end
-		
+
 		scanObjects(Player, DataTable)
 	else
 		warn("DataTable does not exist!")
