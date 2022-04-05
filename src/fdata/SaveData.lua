@@ -1,4 +1,5 @@
 --[Made by Jozeni00]--
+local HttpService = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
 local RunService = game:GetService("RunService")
 local DataSettings = {}
@@ -253,6 +254,11 @@ end
 local function saveParts(Object, Data, num)
 	--RunService.Heartbeat:Wait()
 	if Object then
+		local aName = "DataUniqueKeyId"
+		if not Object:GetAttribute(aName) then
+			Object:SetAttribute(aName, HttpService:GenerateGUID(false))
+		end
+
 		local holdName = ""
 		if not Data then
 			Data = {}
@@ -262,7 +268,7 @@ local function saveParts(Object, Data, num)
 		else
 			holdName = Object.Name --.. "x1"
 		end
-		
+
 		Data[holdName] = {
 			["Archivable"] = Object.Archivable;
 			["ClassName"] = Object.ClassName;
@@ -1108,6 +1114,23 @@ local function saveParts(Object, Data, num)
 				Data[holdName]["ZIndex"] = Object.ZIndex
 				if Object:IsA("Frame") then
 					Data[holdName]["Style"] = Object.Style.Name
+				elseif Object:IsA("ScrollingFrame") then
+					Data[holdName]["AutomaticCanvasSize"] = Object.AutomaticCanvasSize.Name
+					Data[holdName]["BottomImage"] = Object.BottomImage
+					Data[holdName]["CanvasPosition"] = getProp(Object.CanvasPosition)
+					Data[holdName]["CanvasSize"] = getProp(Object.CanvasSize)
+					Data[holdName]["ElasticBehavior"] = Object.ElasticBehavior.Name
+					Data[holdName]["HorizontalScrollBarInset"] = Object.HorizontalScrollBarInset.Name
+					Data[holdName]["MidImage"] = Object.MidImage
+					Data[holdName]["ScrollBarImageColor3"] = getProp(Object.ScrollBarImageColor3)
+					Data[holdName]["ScrollBarImageTransparency"] = Object.ScrollBarImageTransparency
+					Data[holdName]["ScrollBarThickness"] = Object.ScrollBarThickness
+					Data[holdName]["ScrollVelocity"] = getProp(Object.ScrollVelocity)
+					Data[holdName]["ScrollingDirection"] = Object.ScrollingDirection.Name
+					Data[holdName]["ScrollingEnabled"] = Object.ScrollingEnabled
+					Data[holdName]["TopImage"] = Object.TopImage
+					Data[holdName]["VerticalScrollBarInset"] = Object.VerticalScrollBarInset.Name
+					Data[holdName]["VerticalScrollBarPosition"] = Object.VerticalScrollBarPosition.Name
 				elseif Object:IsA("TextLabel") or Object:IsA("TextButton") then
 					Data[holdName]["Font"] = Object.Font.Name
 					Data[holdName]["LineHeight"] = Object.LineHeight
