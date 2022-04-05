@@ -26,7 +26,7 @@ For setting up player data.
 1. Insert a folder named "PresetPlayerData" in ServerStorage. Insert as many objects as prefered under the folder, set their attributes and go crazy with it. During gameplay, this folder will be renamed to the "Scope" you set in the script. By default, the folder is renamed to "PlayerData" because it is the name of the DataStore's scope, so use `ServerStorage:WaitForChild("PlayerData")` in scripts. For the player's data, use `Player:WaitForChild("PlayerData")`.
 2. After finished changing up PresetPlayerData, copy and paste this code into the command bar:
 ```
-  local HttpService = game:GetService("HttpService")
+local HttpService = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
 local PresetPlayerData = ServerStorage:FindFirstChild("PresetPlayerData")
 
