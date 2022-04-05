@@ -5,7 +5,7 @@ Data serializer created using Roblox Studio. The goal is to save everything unde
 - Object attributes.
 - All insertable objects from Roblox Studio's Insert Object widget. Everything, including scripts and meshparts, not kidding.
 - Ability to manipulate data with ease, especially if using a DataStore editor plugin.
-- Auto saving.
+- Auto saving, but is not recommended because of DataStore throttling (may cause data losses).
 - Offline data testing supported.
 
 # Use case examples
@@ -24,11 +24,35 @@ General unique purposes:
 For setting up player data.
 
 1. Insert a folder named "PresetPlayerData" in ServerStorage. Insert as many objects as prefered under the folder, set their attributes and go crazy with it. During gameplay, this folder will be renamed to the "Scope" you set in the script. By default, the folder is renamed to "PlayerData" because it is the name of the DataStore's scope, so use `ServerStorage:WaitForChild("PlayerData")` in scripts. For the player's data, use `Player:WaitForChild("PlayerData")`.
-2. To live test DataStores, be sure to enable Studio API Services.
-3. Change up the player's PlayerData in-game, then rejoin to see if it saved.
+2. After finished changing up PresetPlayerData, copy and paste this code into the command bar:
+```
+  local HttpService = game:GetService("HttpService")
+local ServerStorage = game:GetService("ServerStorage")
+local PresetPlayerData = ServerStorage:FindFirstChild("PresetPlayerData")
+
+if not PresetPlayerData then
+	PresetPlayerData = Instance.new("Folder")
+	PresetPlayerData.Name = "PresetPlayerData"
+	PresetPlayerData.Parent = ServerStorage
+end
+
+local function setUniqueId(object)
+	local aName = "DataUniqueKeyId"
+	if not object:GetAttribute(aName) then
+		object:SetAttribute(aName, HttpService:GenerateGUID(false))
+	end
+end
+
+setUniqueId(PresetPlayerData)
+for i, v in pairs(PresetPlayerData:GetDescendants()) do
+	setUniqueId(v)
+end
+```
+4. To live test DataStores, be sure to enable Studio API Services.
+5. Change up the player's PlayerData in-game, then rejoin to see if it saved.
 
 # Limitations
-- Updating PresetPlayerData will not update old saves, but it will for fresh-new saves. (If you are in need of this functionality, it is recommended to use the JozeniDS Legacy version instead.)
+- Updating PresetPlayerData will require you to copy code and paste into the command bar in Roblox Studio.
 - For objects containing references (i.e. Beam.Attachment0, BillboardGui.Adornee, WeldConstraint.Part1, etc.), it is recommended to utilize unique naming schemes for better results.
 - To save a script, a copy of it with the same name and sourceId must be present within ServerStorage.
 - To save a MeshPart or SurfaceAppearance, a copy of it must be present within ServerStorage.
