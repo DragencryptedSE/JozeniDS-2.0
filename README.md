@@ -23,8 +23,18 @@ General unique purposes:
 # Instructions
 For setting up player data.
 
-1. Insert a folder named "PresetPlayerData" in ServerStorage. Insert as many objects as prefered under the folder, set their attributes and go crazy with it. During gameplay, this folder will be renamed to the "Scope" you set in the script. By default, the folder is renamed to "PlayerData" because it is the name of the DataStore's scope, so use `ServerStorage:WaitForChild("PlayerData")` in scripts. For the player's data, use `Player:WaitForChild("PlayerData")`.
-2. After finished changing up PresetPlayerData, copy and paste this code into the command bar:
+1. Insert a folder named "PresetPlayerData" in ServerStorage. Insert as many objects as prefered under the folder, set their attributes and go crazy with it. During gameplay, this folder will be renamed to the folder name you set in the script. By default, the folder is renamed to "PlayerData" because it is the name of the DataStore's scope, so use `ServerStorage:WaitForChild("PlayerData")` in scripts. For the player's data, use `Player:WaitForChild("PlayerData")`.
+* However, for best results, this code sample will wait for the Player's data to be loaded, and it provides an attribute with the name of the folder:
+```
+-- check if DataStoreLoaded is an attribute of Player.
+if not Player:GetAttribute("DataStoreLoaded") then
+	Player:GetAttributeChangedSignal("DataStoreLoaded"):Wait() -- waits for data to be loaded, returns string "PlayerData".
+end
+
+--Player data
+local PlayerData = Player:WaitForChild(Player:GetAttribute("DataStoreLoaded")) -- returns folder named "PlayerData".
+```
+3. After finished changing up PresetPlayerData, copy and paste this code into the command bar:
 ```
 local HttpService = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
