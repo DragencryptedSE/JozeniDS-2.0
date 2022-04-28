@@ -7,6 +7,7 @@ Data serializer created using Roblox Studio. The goal is to save everything unde
 - Ability to manipulate data with ease, especially if using a DataStore editor plugin.
 - Auto saving, but is not recommended because of DataStore throttling (may cause data losses).
 - Offline data testing supported.
+- Studio-only DataStore Scope support.
 
 # Use case examples
 Unique to 2.0:
