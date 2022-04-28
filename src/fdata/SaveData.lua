@@ -254,7 +254,7 @@ end
 local function saveParts(Object, Data, num)
 	--RunService.Heartbeat:Wait()
 	if Object then
-		local aName = "DataUniqueKeyId"
+		local aName = "GUID"
 		if not Object:GetAttribute(aName) then
 			Object:SetAttribute(aName, HttpService:GenerateGUID(false))
 		end
