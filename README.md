@@ -50,6 +50,30 @@ end
 ```
 4. To live test DataStores, be sure to enable Studio API Services.
 5. Change up the player's PlayerData in-game, then rejoin to see if it saved.
+6. If later you feel like removing unique identifiers (GUID or UUID), copy and paste this code into the command bar in Studio:
+```
+local HttpService = game:GetService("HttpService")
+local ServerStorage = game:GetService("ServerStorage")
+local PresetPlayerData = ServerStorage:FindFirstChild("PresetPlayerData")
+
+if not PresetPlayerData then
+    PresetPlayerData = Instance.new("Folder")
+    PresetPlayerData.Name = "PresetPlayerData"
+    PresetPlayerData.Parent = ServerStorage
+end
+
+local function setUniqueId(object)
+    local aName = "GUID"
+    if object:GetAttribute(aName) then
+        object:SetAttribute(aName, nil)
+    end
+end
+
+setUniqueId(PresetPlayerData)
+for i, v in pairs(PresetPlayerData:GetDescendants()) do
+    setUniqueId(v)
+end
+```
 
 # Limitations
 - Updating PresetPlayerData will require you to copy code and paste into the command bar in Roblox Studio.
