@@ -34,7 +34,7 @@ end
 --Player data
 local PlayerData = Player:WaitForChild(Player:GetAttribute("DataStoreLoaded")) -- returns folder named "PlayerData".
 ```
-3. After finished changing up PresetPlayerData, copy and paste this code into the command bar:
+2. After finished changing up PresetPlayerData, copy and paste this code into the command bar:
 ```
 local HttpService = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
@@ -58,9 +58,9 @@ for i, v in pairs(PresetPlayerData:GetDescendants()) do
 	setUniqueId(v)
 end
 ```
-4. To live test DataStores, be sure to enable Studio API Services.
-5. Change up the player's PlayerData in-game, then rejoin to see if it saved.
-6. If later you feel like removing unique identifiers (GUID or UUID), copy and paste this code into the command bar in Studio:
+3. To live test DataStores, be sure to enable Studio API Services.
+4. Change up the player's PlayerData in-game, then rejoin to see if it saved.
+5. If later you feel like removing unique identifiers (GUID or UUID), copy and paste this code into the command bar in Studio:
 ```
 local HttpService = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
