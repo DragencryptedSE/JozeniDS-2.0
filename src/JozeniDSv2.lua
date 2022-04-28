@@ -3,17 +3,23 @@ print("Jozeni00\'s DataStore v2.0 loaded.")
 local DataSettings = {
 	--{DATA}--
 	--Any changes made below are susceptible to a clean data wipe, or revert data to its previous.
-	["Name"] = "JozeniDS_Test2V0-0-0"; --DataStore name for the entire game.
-	["Scope"] = "PlayerData"; --Player's DataStore folder name (a folder with this name will appear under each Player).
+	["Name"] = "JozeniDS_Test2V0-0-0ab0"; --DataStore name for the entire game.
+	["Scope"] = "PlayerData"; --The scope of the datastore for a live game.
 	["Key"] = "Player_"; --prefix for key. Example: "Player_" is used for "Player_123456".
 
-	--[FEATURES]--
+	--{FEATURES}--
+	["FolderName"] = "PlayerData"; --Name of the folder that will appear under the Player.
+	["LoadedName"] = "DataStoreLoaded"; --Name of the attribute when the player finishes loading DataStore. Returns Folder name.
+
 	["AutoSave"] = false; --set to true to enable auto saving, however players may experience data loss due to throttling.
 	["SaveTime"] = 1; --time (in minutes) how often it should automatically save.
+
+	["UseStudioScope"] = true; --set to true to use a different Scope for Studio only.
+	["DevScope"] = "dev"; --Scope of the datastore for Studio, if UseStudioScope is true.
 }
 
 --[[
-	[LAST UPDATED]: 04 April 2022
+	[LAST UPDATED]: 28 April 2022
 
 	I appreciate you for using Jozeni00's DataStore script!
 
@@ -32,9 +38,9 @@ local DataSettings = {
 			- (Blame Roblox for disallowing developers readable access to object unique identifiers.)
 
 [REQUIRED IF USING 2.0 VERSION]
-If PresetPlayerData was changed, copy and paste this code below into the command bar in studio.
+If any instance was added into PresetPlayerData from Studio, copy and paste this code below into the command bar in studio.
 
---{COPY CODE}--
+--{COPY CODE - TO ADD GUID's}--
 
 local HttpService = game:GetService("HttpService")
 local ServerStorage = game:GetService("ServerStorage")
@@ -47,7 +53,7 @@ if not PresetPlayerData then
 end
 
 local function setUniqueId(object)
-	local aName = "DataUniqueKeyId"
+	local aName = "GUID"
 	if not object:GetAttribute(aName) then
 		object:SetAttribute(aName, HttpService:GenerateGUID(false))
 	end
@@ -58,6 +64,37 @@ for i, v in pairs(PresetPlayerData:GetDescendants()) do
 	setUniqueId(v)
 end
 --{COPY CODE (END)}--
+
+
+
+[To remove GUID]
+If wanting to remove GUID's copy and paste this code into the command bar in studio.
+
+--[COPY CODE - TO DELETE GUID's]--
+
+local HttpService = game:GetService("HttpService")
+local ServerStorage = game:GetService("ServerStorage")
+local PresetPlayerData = ServerStorage:FindFirstChild("PresetPlayerData")
+
+if not PresetPlayerData then
+    PresetPlayerData = Instance.new("Folder")
+    PresetPlayerData.Name = "PresetPlayerData"
+    PresetPlayerData.Parent = ServerStorage
+end
+
+local function setUniqueId(object)
+    local aName = "GUID"
+    if object:GetAttribute(aName) then
+        object:SetAttribute(aName, nil)
+    end
+end
+
+setUniqueId(PresetPlayerData)
+for i, v in pairs(PresetPlayerData:GetDescendants()) do
+    setUniqueId(v)
+end
+--[COPY CODE (END)]--
+
 
 	[Instructions]
 	Studio API Services are no longer required for this script to operate.
@@ -116,13 +153,17 @@ end
 	5. A new Mesh should appear in "Meshes" of Asset Manager.
 
 	Referencing PlayerData Example:
-	(from a server Script)
 	-----------------------------------------------------------------
+		-- wait for datastore to load
+		if not Player:GetAttribute("DataStoreLoaded") then
+			Player:GetAttributeChangedSignal("DataStoreLoaded"):Wait() -- returns datastore folder name, "PlayerData"
+		end
+
 		--New Data:
-		local PlayerData = Player:WaitForChild("PlayerData")
+		local PlayerData = Player:FindFirstChild(Player:GetAttribute("DataStoreLoaded"))
 		local SavedData = PlayerData:FindFirstChild("SavedData")
 		local Gold = SavedData:FindFirstChild("Gold")
-		Gold.Value = 2600
+		Gold.Value = 2600 --changing data from a LocalScript will not save because it is not Server-Sided.
 
 		--Player on leaving... New Data has been saved.
 	-----------------------------------------------------------------
@@ -137,7 +178,7 @@ end
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local Debris = game:GetService("Debris")
-local fileName = DataSettings.Scope
+local RunService = game:GetService("RunService")
 
 local msSave = script:FindFirstChild("SaveData")
 local msLoad = script:FindFirstChild("LoadData")
@@ -149,30 +190,49 @@ local loadModule = require(msLoad)
 --storage
 local ServerStorage = game:GetService("ServerStorage")
 local PresetPlayerData = ServerStorage:FindFirstChild("PresetPlayerData")
+local fileName = DataSettings.FolderName
 if not PresetPlayerData then
 	warn("folder PresetPlayerData does not exist in ServerStorage!")
 	PresetPlayerData = Instance.new("Folder")
 	PresetPlayerData.Name = fileName
 	PresetPlayerData.Parent = ServerStorage
 else
+	if not PresetPlayerData:IsA("Folder") then
+		local newPreset = Instance.new("Folder")
+
+		for i, v in pairs(PresetPlayerData:GetChildren()) do
+			v.Parent = newPreset
+		end
+
+		newPreset.Parent = ServerStorage
+
+		PresetPlayerData:Destroy()
+		PresetPlayerData = newPreset
+		PresetPlayerData:SetAttribute("GUID", HttpService:GenerateGUID(false))
+	end
 	PresetPlayerData.Name = fileName
+end
+
+--set scope
+if DataSettings.UseStudioScope then
+	if RunService:IsStudio() then
+		DataSettings.Scope = DataSettings.DevScope
+	end
+end
+if DataSettings.Scope == "" then
+	DataSettings.Scope = "global"
 end
 
 --data
 local DataStoreService = game:GetService("DataStoreService")
-local DataKey = DataSettings.Name
-local PlayerDataStore = DataStoreService:GetDataStore(DataKey, fileName)
+local PlayerDataStore = DataStoreService:GetDataStore(DataSettings.Name, DataSettings.Scope)
 
 --player entered
 local function onPlayerEntered(Player)
 	local PlayerKey = DataSettings.Key .. Player.UserId
 
-	local PlayerData = PresetPlayerData:Clone()
-	PlayerData.Name = fileName
-	PlayerData.Parent = Player
-
 	--load data
-	local success, result = pcall(function()
+	local success, DataResult = pcall(function()
 		local DataTable = PlayerDataStore:GetAsync(PlayerKey)
 		if DataTable == nil then
 			print(Player.Name .. " is a new player, creating save...")
@@ -184,11 +244,19 @@ local function onPlayerEntered(Player)
 		return DataTable
 	end)
 	if success then
-		loadModule:Load(Player, result, fileName)
+		local PlayerData = PresetPlayerData:Clone()
+		PlayerData.Parent = Player
+
+		loadModule:Load(Player, PlayerData, DataResult)
+		Player:SetAttribute(DataSettings.LoadedName, DataSettings.FolderName)
 		print(Player.UserId .. " | " .. Player.Name .. " loaded in " .. DataSettings.Scope .. ".")
 	else
-		warn(result)
-		if result:match("Studio access to APIs is not allowed.") then
+		warn(DataResult)
+		if DataResult:match("Studio access to APIs is not allowed.") then
+			local PlayerData = PresetPlayerData:Clone()
+			PlayerData.Parent = Player
+
+			Player:SetAttribute(DataSettings.LoadedName, DataSettings.FolderName)
 			print(Player.UserId .. " | " .. Player.Name .. " loaded in without DataStore access.")
 		else
 			Player:Kick("Internal server error, please rejoin.")
@@ -216,7 +284,7 @@ local function onPlayerEntered(Player)
 			local success, result = pcall(function()
 				PlayerDataStore:UpdateAsync(PlayerKey, function(oldValue)
 					local newValue = serialize or oldValue
-					return newValue
+					return newValue, {Player.UserId}
 				end)
 			end)
 
@@ -254,7 +322,7 @@ local function onPlayerRemoving(Player)
 		local success, result = pcall(function()
 			PlayerDataStore:UpdateAsync(PlayerKey, function(oldValue)
 				local newValue = serialize or oldValue
-				return newValue
+				return newValue, {Player.UserId}
 			end)
 		end)
 		if success then
@@ -274,7 +342,7 @@ local function onPlayerRemoving(Player)
 		for i, v in pairs(PlayerData:GetDescendants()) do
 			if v:IsA("ObjectValue") then
 				if v.Value then
-					Debris:AddItem(v, 5)
+					Debris:AddItem(v.Value, 4)
 				end
 			else
 				continue
@@ -304,7 +372,7 @@ game:BindToClose(function()
 		v:Kick()
 	end
 	task.wait(3)
-	print("Name: " .. DataKey)
-	print("Scope: " .. fileName)
+	print("Name: " .. DataSettings.Name)
+	print("Scope: " .. DataSettings.Scope)
 end)
 --[Made by Jozeni00]--
