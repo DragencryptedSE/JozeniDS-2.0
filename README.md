@@ -87,7 +87,8 @@ end
 ```
 
 # Limitations
-- Updating PresetPlayerData will require you to copy code and paste into the command bar in Roblox Studio. This is because Roblox does not allow developers readable access to Instance's unique identifiers, as of April 2022.
+- Adding new instances to PresetPlayerData will require you to copy code and paste into the command bar in Roblox Studio. This is because Roblox does not allow developers readable access to Instance's unique identifiers, as of April 2022. 
+- If you copy-paste instances with an existing GUID attribute under PresetPlayerData, then you must enter the commands to remove and re-add the GUID attributes.
 - For objects containing references (i.e. Beam.Attachment0, BillboardGui.Adornee, WeldConstraint.Part1, etc.), it is recommended to utilize unique naming schemes for better results.
 - To save a script, a copy of it with the same name and sourceId must be present within ServerStorage.
 - To save a MeshPart or SurfaceAppearance, a copy of it must be present within ServerStorage.
