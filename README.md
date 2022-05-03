@@ -37,26 +37,39 @@ local PlayerData = Player:WaitForChild(Player:GetAttribute("DataStoreLoaded")) -
 ```
 2. After finished changing up PresetPlayerData, copy and paste this code into the command bar:
 ```
+local serverStorage = game:GetService("ServerStorage")
 local HttpService = game:GetService("HttpService")
-local ServerStorage = game:GetService("ServerStorage")
-local PresetPlayerData = ServerStorage:FindFirstChild("PresetPlayerData")
+local preset = serverStorage:FindFirstChild("PresetPlayerData")
 
-if not PresetPlayerData then
-	PresetPlayerData = Instance.new("Folder")
-	PresetPlayerData.Name = "PresetPlayerData"
-	PresetPlayerData.Parent = ServerStorage
-end
-
-local function setUniqueId(object)
-	local aName = "DataUniqueKeyId"
-	if not object:GetAttribute(aName) then
-		object:SetAttribute(aName, HttpService:GenerateGUID(false))
+local function checkMatchId(folder)
+	local function checkObj(scannedObj, ParaObject)
+		if scannedObj ~= ParaObject then
+			local guid = scannedObj:GetAttribute("GUID")
+			if guid then
+				if guid == ParaObject:GetAttribute("GUID") then
+					ParaObject:SetAttribute("GUID", HttpService:GenerateGUID(false))
+					checkMatchId(ParaObject)
+				end
+			end
+		end
+	end
+	
+	checkObj(preset, folder)
+	for i, v in pairs(preset:GetDescendants()) do
+		checkObj(v, folder)
 	end
 end
 
-setUniqueId(PresetPlayerData)
-for i, v in pairs(PresetPlayerData:GetDescendants()) do
-	setUniqueId(v)
+local function setGuid(folder)
+	if not folder:GetAttribute("GUID") then
+		folder:SetAttribute("GUID", HttpService:GenerateGUID(false))
+		checkMatchId(folder)
+	end
+end
+
+setGuid(preset)
+for i, v in pairs(preset:GetDescendants()) do
+	setGuid(v)
 end
 ```
 3. To live test DataStores, be sure to enable Studio API Services.
