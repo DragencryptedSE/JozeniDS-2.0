@@ -125,84 +125,37 @@ local function setReference(newObj, parent, info, prop)
 		until highestParent.Parent == nil or not highestParent.Parent:GetAttribute("GUID")
 
 		--split the location
-		local splitLocations = info.Location:split(".")
-		local lastParent = nil
-		local startPos = 2
-		local foundPos = false
+		local referenceObj = nil
 
-		--uncover real location
-		for i, v in pairs(splitLocations) do
-			if v == highestParent.Name then
-				startPos = i + 1
-				foundPos = true
-				break
-			end
-		end
-
-		--find the location of reference
-		if foundPos then
-			for i, v in pairs(splitLocations) do
-				if i == startPos then
-					lastParent = highestParent:WaitForChild(v)
-				elseif i > startPos then
-					lastParent = lastParent:WaitForChild(v)
-				end
-			end
-		else
-			for i, v in pairs(splitLocations) do
-				if i == 1 then
-					lastParent = game:GetService(v)
-				elseif i > 1 then
-					lastParent = lastParent:WaitForChild(v)
+		for i, v in pairs(highestParent:GetDescendants()) do
+			if v:IsA(info.ClassName) then
+				if v:GetAttribute("GUID") == info.GUID then
+					referenceObj = v
 				end
 			end
 		end
 
-		--check if classname was not found
-		if lastParent.ClassName ~= info.ClassName then
-			local foundObj = false
-			for i, v in pairs(highestParent:GetDescendants()) do
-				if v:IsA(info.ClassName) then
-					if v.Parent and v.Parent.Name == splitLocations[#splitLocations - 1] then
-						if v.Name == splitLocations[#splitLocations] then
-							lastParent = v
-							foundObj = true
-							break
-						end
+		--if doesnt exist, then find.
+		if not referenceObj then
+			local descAdd = highestParent.DescendantAdded:Connect(function(child)
+				if child:IsA(info.ClassName) then
+					if child:GetAttribute("GUID") == info.GUID then
+						referenceObj = child
 					end
 				end
+			end)
+
+			while not referenceObj do
+				RunService.Heartbeat:Wait()
 			end
 
-			if not foundObj then
-				local higherObj = lastParent.Parent
-				local AddedChild = nil
-
-				AddedChild = higherObj.ChildAdded:Connect(function(child)
-					if foundObj then
-						AddedChild:Disconnect()
-						return
-					end
-
-					if child:IsA(info.ClassName) then
-						if child.Name == splitLocations[#splitLocations] then
-							lastParent = child
-							foundObj = true
-						end
-					end
-				end)
-
-				repeat
-					RunService.Heartbeat:Wait()
-				until foundObj == true
-
-				if AddedChild and AddedChild.Connected then
-					AddedChild:Disconnect()
-				end
+			if descAdd and descAdd.Connected then
+				descAdd:Disconnect()
 			end
 		end
 
 		--set reference
-		newObj[prop] = lastParent
+		newObj[prop] = referenceObj
 	end)
 
 	if info then
