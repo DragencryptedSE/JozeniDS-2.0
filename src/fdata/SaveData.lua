@@ -368,9 +368,17 @@ local function saveParts(Object, Data, num)
 			Data[holdName]["CFrame"] = getProp(Object.CFrame)
 			if Object.CameraSubject then
 				Data[holdName]["CameraSubject"] = {
-					["Location"] = Object.CameraSubject:GetFullName();
 					["ClassName"] = Object.CameraSubject.ClassName;
+					["GUID"] = Object.CameraSubject:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["CameraSubject"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.CameraSubject:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["CameraSubject"]["GUID"] = Object.CameraSubject:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			Data[holdName]["CameraType"] = Object.CameraType.Name
 			Data[holdName]["DiagonalFieldOfView"] = Object.DiagonalFieldOfView
@@ -477,15 +485,31 @@ local function saveParts(Object, Data, num)
 			Data[holdName]["Enabled"] = Object.Enabled
 			if Object.Part0 then
 				Data[holdName]["Part0"] = {
-					["Location"] = Object.Part0:GetFullName();
 					["ClassName"] = Object.Part0.ClassName;
+					["GUID"] = Object.Part0:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Part0"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Part0:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Part0"]["GUID"] = Object.Part0:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object.Part1 then
 				Data[holdName]["Part1"] = {
-					["Location"] = Object.Part1:GetFullName();
 					["ClassName"] = Object.Part1.ClassName;
+					["GUID"] = Object.Part1:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Part1"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Part1:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Part1"]["GUID"] = Object.Part1:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object:IsA("Motor") then
 				Data[holdName]["CurrentAngle"] = Object.CurrentAngle
@@ -519,9 +543,17 @@ local function saveParts(Object, Data, num)
 			Data[holdName]["RequiresLineOfSight"] = Object.RequiresLineOfSight
 			if Object.RootLocalizationTable then
 				Data[holdName]["RootLocalizationTable"] = {
-					["Location"] = Object.RootLocalizationTable:GetFullName();
 					["ClassName"] = Object.RootLocalizationTable.ClassName;
+					["GUID"] = Object.RootLocalizationTable:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["RootLocalizationTable"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.RootLocalizationTable:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["RootLocalizationTable"]["GUID"] = Object.RootLocalizationTable:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			Data[holdName]["Style"] = Object.Style.Name
 			Data[holdName]["UIOffset"] = getProp(Object.UIOffset)
@@ -556,13 +588,21 @@ local function saveParts(Object, Data, num)
 			Data[holdName]["RollOffMode"] = Object.RollOffMode.Name;
 			if Object.SoundGroup then
 				Data[holdName]["SoundGroup"] = {
-					["Location"] = Object.SoundGroup:GetFullName();
 					["ClassName"] = Object.SoundGroup.ClassName;
+					["GUID"] = Object.SoundGroup:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["SoundGroup"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.SoundGroup:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["SoundGroup"]["GUID"] = Object.SoundGroup:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			Data[holdName]["SoundId"] = Object.SoundId;
 			Data[holdName]["TimePosition"] = Object.TimePosition;
-			Data[holdName]["Volume"] = Object.Volume;
+			Data[holdName]["Volume"] = math.floor(Object.Volume * 1000)/1000
 		elseif Object:IsA("SoundEffect") then
 			Data[holdName]["Enabled"] = Object.Enabled
 			Data[holdName]["Priority"] = Object.Priority
@@ -640,15 +680,31 @@ local function saveParts(Object, Data, num)
 			--shape
 			if Object.Attachment0 then
 				Data[holdName]["Attachment0"] = {
-					["Location"] = Object.Attachment0:GetFullName();
 					["ClassName"] = Object.Attachment0.ClassName;
+					["GUID"] = Object.Attachment0:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment0"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment0:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment0"]["GUID"] = Object.Attachment0:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object.Attachment1 then
 				Data[holdName]["Attachment1"] = {
-					["Location"] = Object.Attachment1:GetFullName();
 					["ClassName"] = Object.Attachment1.ClassName;
+					["GUID"] = Object.Attachment1:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment1"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment1:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment1"]["GUID"] = Object.Attachment1:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			Data[holdName]["CurveSize0"] = Object.CurveSize0;
 			Data[holdName]["CurveSize1"] = Object.CurveSize1;
@@ -674,9 +730,17 @@ local function saveParts(Object, Data, num)
 		elseif Object:IsA("Highlight") then
 			if Object.Adornee then
 				Data[holdName]["Adornee"] = {
-					["Location"] = Object.Adornee:GetFullName();
 					["ClassName"] = Object.Adornee.ClassName;
+					["GUID"] = Object.Adornee:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Adornee"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Adornee:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Adornee"]["GUID"] = Object.Adornee:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			Data[holdName]["DepthMode"] = Object.DepthMode.Name
 			Data[holdName]["Enabled"] = Object.Enabled;
@@ -700,15 +764,31 @@ local function saveParts(Object, Data, num)
 			--shape
 			if Object.Attachment0 then
 				Data[holdName]["Attachment0"] = {
-					["Location"] = Object.Attachment0:GetFullName();
 					["ClassName"] = Object.Attachment0.ClassName;
+					["GUID"] = Object.Attachment0:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment0"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment0:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment0"]["GUID"] = Object.Attachment0:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object.Attachment1 then
 				Data[holdName]["Attachment1"] = {
-					["Location"] = Object.Attachment1:GetFullName();
 					["ClassName"] = Object.Attachment1.ClassName;
+					["GUID"] = Object.Attachment1:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment1"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment1:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment1"]["GUID"] = Object.Attachment1:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			Data[holdName]["Brightness"] = Object.Brightness;
 			Data[holdName]["Color"] = getProp(Object.Color);
@@ -831,15 +911,31 @@ local function saveParts(Object, Data, num)
 			--shape
 			if Object.Attachment0 then
 				Data[holdName]["Attachment0"] = {
-					["Location"] = Object.Attachment0:GetFullName();
 					["ClassName"] = Object.Attachment0.ClassName;
+					["GUID"] = Object.Attachment0:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment0"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment0:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment0"]["GUID"] = Object.Attachment0:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object.Attachment1 then
 				Data[holdName]["Attachment1"] = {
-					["Location"] = Object.Attachment1:GetFullName();
 					["ClassName"] = Object.Attachment1.ClassName;
+					["GUID"] = Object.Attachment1:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment1"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment1:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment1"]["GUID"] = Object.Attachment1:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object:IsA("AlignOrientation") then
 				Data[holdName]["AlignType"] = Object.AlignType.Name
@@ -992,15 +1088,31 @@ local function saveParts(Object, Data, num)
 			--shape
 			if Object.Part0 then
 				Data[holdName]["Part0"] = {
-					["Location"] = Object.Part0:GetFullName();
 					["ClassName"] = Object.Part0.ClassName;
+					["GUID"] = Object.Part0:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Part0"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Part0:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Part0"]["GUID"] = Object.Part0:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object.Part1 then
 				Data[holdName]["Part1"] = {
-					["Location"] = Object.Part1:GetFullName();
 					["ClassName"] = Object.Part1.ClassName;
+					["GUID"] = Object.Part1:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Part1"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Part1:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Part1"]["GUID"] = Object.Part1:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 		elseif Object:IsA("LocalizationTable") then
 			Data[holdName]["SourceLocaleId"] = Object.SourceLocaleId
@@ -1008,9 +1120,17 @@ local function saveParts(Object, Data, num)
 			Data[holdName]["AutoLocalize"] = Object.AutoLocalize
 			if Object.RootLocalizationTable then
 				Data[holdName]["RootLocalizationTable"] = {
-					["Location"] = Object.RootLocalizationTable:GetFullName();
 					["ClassName"] = Object.RootLocalizationTable.ClassName;
+					["GUID"] = Object.RootLocalizationTable:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["RootLocalizationTable"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.RootLocalizationTable:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["RootLocalizationTable"]["GUID"] = Object.RootLocalizationTable:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object:IsA("LayerCollector") then
 				Data[holdName]["Enabled"] = Object.Enabled
@@ -1023,9 +1143,17 @@ local function saveParts(Object, Data, num)
 					Data[holdName]["Active"] = Object.Active
 					if Object.Adornee then
 						Data[holdName]["Adornee"] = {
-							["Location"] = Object.Adornee:GetFullName();
 							["ClassName"] = Object.Adornee.ClassName;
+							["GUID"] = Object.Adornee:GetAttribute("GUID");
 						}
+						local dataGuid = Data[holdName]["Adornee"]["GUID"]
+						if not dataGuid then
+							local getGuid = coroutine.wrap(function()
+								Object.Adornee:GetAttributeChangedSignal("GUID"):Wait()
+								Data[holdName]["Adornee"]["GUID"] = Object.Adornee:GetAttribute("GUID")
+							end)
+							getGuid()
+						end
 					end
 					Data[holdName]["AlwaysOnTop"] = Object.AlwaysOnTop
 					Data[holdName]["Brightness"] = Object.Brightness
@@ -1048,9 +1176,17 @@ local function saveParts(Object, Data, num)
 					Data[holdName]["Active"] = Object.Active
 					if Object.Adornee then
 						Data[holdName]["Adornee"] = {
-							["Location"] = Object.Adornee:GetFullName();
 							["ClassName"] = Object.Adornee.ClassName;
+							["GUID"] = Object.Adornee:GetAttribute("GUID");
 						}
+						local dataGuid = Data[holdName]["Adornee"]["GUID"]
+						if not dataGuid then
+							local getGuid = coroutine.wrap(function()
+								Object.Adornee:GetAttributeChangedSignal("GUID"):Wait()
+								Data[holdName]["Adornee"]["GUID"] = Object.Adornee:GetAttribute("GUID")
+							end)
+							getGuid()
+						end
 					end
 					Data[holdName]["AlwaysOnTop"] = Object.AlwaysOnTop
 					Data[holdName]["Brightness"] = Object.Brightness
@@ -1076,36 +1212,76 @@ local function saveParts(Object, Data, num)
 				Data[holdName]["LayoutOrder"] = Object.LayoutOrder
 				if Object.NextSelectionDown then
 					Data[holdName]["NextSelectionDown"] = {
-						["Location"] = Object.NextSelectionDown:GetFullName();
 						["ClassName"] = Object.NextSelectionDown.ClassName;
+						["GUID"] = Object.NextSelectionDown:GetAttribute("GUID");
 					}
+					local dataGuid = Data[holdName]["NextSelectionDown"]["GUID"]
+					if not dataGuid then
+						local getGuid = coroutine.wrap(function()
+							Object.NextSelectionDown:GetAttributeChangedSignal("GUID"):Wait()
+							Data[holdName]["NextSelectionDown"]["GUID"] = Object.NextSelectionDown:GetAttribute("GUID")
+						end)
+						getGuid()
+					end
 				end
 				if Object.NextSelectionLeft then
 					Data[holdName]["NextSelectionLeft"] = {
-						["Location"] = Object.NextSelectionLeft:GetFullName();
 						["ClassName"] = Object.NextSelectionLeft.ClassName;
+						["GUID"] = Object.NextSelectionLeft:GetAttribute("GUID");
 					}
+					local dataGuid = Data[holdName]["NextSelectionLeft"]["GUID"]
+					if not dataGuid then
+						local getGuid = coroutine.wrap(function()
+							Object.NextSelectionLeft:GetAttributeChangedSignal("GUID"):Wait()
+							Data[holdName]["NextSelectionLeft"]["GUID"] = Object.NextSelectionLeft:GetAttribute("GUID")
+						end)
+						getGuid()
+					end
 				end
 				if Object.NextSelectionRight then
 					Data[holdName]["NextSelectionRight"] = {
-						["Location"] = Object.NextSelectionRight:GetFullName();
 						["ClassName"] = Object.NextSelectionRight.ClassName;
+						["GUID"] = Object.NextSelectionRight:GetAttribute("GUID");
 					}
+					local dataGuid = Data[holdName]["NextSelectionRight"]["GUID"]
+					if not dataGuid then
+						local getGuid = coroutine.wrap(function()
+							Object.NextSelectionRight:GetAttributeChangedSignal("GUID"):Wait()
+							Data[holdName]["NextSelectionRight"]["GUID"] = Object.NextSelectionRight:GetAttribute("GUID")
+						end)
+						getGuid()
+					end
 				end
 				if Object.NextSelectionUp then
 					Data[holdName]["NextSelectionUp"] = {
-						["Location"] = Object.NextSelectionUp:GetFullName();
 						["ClassName"] = Object.NextSelectionUp.ClassName;
+						["GUID"] = Object.NextSelectionUp:GetAttribute("GUID");
 					}
+					local dataGuid = Data[holdName]["NextSelectionUp"]["GUID"]
+					if not dataGuid then
+						local getGuid = coroutine.wrap(function()
+							Object.NextSelectionUp:GetAttributeChangedSignal("GUID"):Wait()
+							Data[holdName]["NextSelectionUp"]["GUID"] = Object.NextSelectionUp:GetAttribute("GUID")
+						end)
+						getGuid()
+					end
 				end
 				Data[holdName]["Position"] = getProp(Object.Position)
 				Data[holdName]["Rotation"] = Object.Rotation
 				Data[holdName]["Selectable"] = Object.Selectable
 				if Object.SelectionImageObject then
 					Data[holdName]["SelectionImageObject"] = {
-						["Location"] = Object.SelectionImageObject:GetFullName();
 						["ClassName"] = Object.SelectionImageObject.ClassName;
+						["GUID"] = Object.SelectionImageObject:GetAttribute("GUID");
 					}
+					local dataGuid = Data[holdName]["SelectionImageObject"]["GUID"]
+					if not dataGuid then
+						local getGuid = coroutine.wrap(function()
+							Object.SelectionImageObject:GetAttributeChangedSignal("GUID"):Wait()
+							Data[holdName]["SelectionImageObject"]["GUID"] = Object.SelectionImageObject:GetAttribute("GUID")
+						end)
+						getGuid()
+					end
 				end
 				Data[holdName]["Size"] = getProp(Object.Size)
 				Data[holdName]["SizeConstraint"] = Object.SizeConstraint.Name
@@ -1219,9 +1395,17 @@ local function saveParts(Object, Data, num)
 			if Object:IsA("PartAdornment") then
 				if Object.Adornee then
 					Data[holdName]["Adornee"] = {
-						["Location"] = Object.Adornee:GetFullName();
 						["ClassName"] = Object.Adornee.ClassName;
+						["GUID"] = Object.Adornee:GetAttribute("GUID");
 					}
+					local dataGuid = Data[holdName]["Adornee"]["GUID"]
+					if not dataGuid then
+						local getGuid = coroutine.wrap(function()
+							Object.Adornee:GetAttributeChangedSignal("GUID"):Wait()
+							Data[holdName]["Adornee"]["GUID"] = Object.Adornee:GetAttribute("GUID")
+						end)
+						getGuid()
+					end
 				end
 				if Object:IsA("ArcHandles") then
 					Data[holdName]["Axes"] = getProp(Object.Axes)
@@ -1234,9 +1418,17 @@ local function saveParts(Object, Data, num)
 			elseif Object:IsA("PVAdornment") then
 				if Object.Adornee then
 					Data[holdName]["Adornee"] = {
-						["Location"] = Object.Adornee:GetFullName();
 						["ClassName"] = Object.Adornee.ClassName;
+						["GUID"] = Object.Adornee:GetAttribute("GUID");
 					}
+					local dataGuid = Data[holdName]["Adornee"]["GUID"]
+					if not dataGuid then
+						local getGuid = coroutine.wrap(function()
+							Object.Adornee:GetAttributeChangedSignal("GUID"):Wait()
+							Data[holdName]["Adornee"]["GUID"] = Object.Adornee:GetAttribute("GUID")
+						end)
+						getGuid()
+					end
 				end
 				if Object:IsA("HandleAdornment") then
 					Data[holdName]["AdornCullingMode"] = Object.AdornCullingMode.Name
@@ -1275,15 +1467,31 @@ local function saveParts(Object, Data, num)
 		elseif Object:IsA("PathfindingLink") then
 			if Object.Attachment0 then
 				Data[holdName]["Attachment0"] = {
-					["Location"] = Object.Attachment0:GetFullName();
 					["ClassName"] = Object.Attachment0.ClassName;
+					["GUID"] = Object.Attachment0:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment0"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment0:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment0"]["GUID"] = Object.Attachment0:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			if Object.Attachment1 then
 				Data[holdName]["Attachment1"] = {
-					["Location"] = Object.Attachment1:GetFullName();
 					["ClassName"] = Object.Attachment1.ClassName;
+					["GUID"] = Object.Attachment1:GetAttribute("GUID");
 				}
+				local dataGuid = Data[holdName]["Attachment1"]["GUID"]
+				if not dataGuid then
+					local getGuid = coroutine.wrap(function()
+						Object.Attachment1:GetAttributeChangedSignal("GUID"):Wait()
+						Data[holdName]["Attachment1"]["GUID"] = Object.Attachment1:GetAttribute("GUID")
+					end)
+					getGuid()
+				end
 			end
 			Data[holdName]["IsBidirectional"] = Object.IsBidirectional
 			Data[holdName]["Label"] = Object.Label
