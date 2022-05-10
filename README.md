@@ -8,8 +8,8 @@ It scans Instances under a folder, then serializes it to be stored into a Data S
 - Can save attributes.
 - Capable of saving any Instance from Roblox Studio's Insert Object widget. Everything, including scripts, meshparts.
 - Ability to manipulate data with ease, especially if using a DataStore editor plugin.
-- Auto saving.
-- Offline mode supported.
+- Auto saving support.
+- Offline mode support.
 - Studio-only DataStore Scope support.
 
 # Use case examples
