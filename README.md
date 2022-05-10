@@ -1,9 +1,12 @@
 # JozeniDS 2.0
-Data serializer created using Roblox Studio. The goal is to save everything under a single folder. Version 2.0 is aimed for hardcore games that rely on objects with matching names.
+A folder based Data Store script aimed to be useful for in-depth hardcore experiences.
+
+## Description
+It scans Instances under a folder, then serializes it to be stored into a Data Store.
 
 # Saving Features
-- Object attributes.
-- All insertable objects from Roblox Studio's Insert Object widget. Everything, including scripts and meshparts, not kidding.
+- Can save attributes.
+- Capable of saving any Instance from Roblox Studio's Insert Object widget. Everything, including scripts, meshparts.
 - Ability to manipulate data with ease, especially if using a DataStore editor plugin.
 - Auto saving, but is not recommended because of DataStore throttling (may cause data losses).
 - Offline data testing supported.
