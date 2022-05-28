@@ -23,7 +23,8 @@ General unique purposes:
 - The player creating and selling their in-game custom weapon to the game's marketplace feature for other players to purchase and keep.
 
 # Installation
-Get the module here: [https://www.roblox.com/library/9229642410/Jozeni-Data-Serializer-2-0](https://www.roblox.com/library/9742533961/Data-Serializer-2-0)
+1. Get the module here: [https://www.roblox.com/library/9229642410/Jozeni-Data-Serializer-2-0](https://www.roblox.com/library/9742533961/Data-Serializer-2-0)
+2. Insert a folder named "PresetPlayerData" into `ServerStorage`.
 
 # Instructions
 For setting up player data.
