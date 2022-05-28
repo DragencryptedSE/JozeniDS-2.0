@@ -1,5 +1,6 @@
 # Data Serializer 2.0
 A folder based Data Store script aimed to be useful for in-depth hardcore experiences.
+API Documentation can be found [here](https://github.com/DragencryptedSE/JozeniDS-2.0/wiki/API-Documentation).
 
 ## Description
 It scans Instances under a folder, then serializes it to be stored into a Data Store.
