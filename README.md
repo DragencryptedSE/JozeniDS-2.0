@@ -1,4 +1,4 @@
-# JozeniDS 2.0
+# Data Serializer 2.0
 A folder based Data Store script aimed to be useful for in-depth hardcore experiences.
 
 ## Description
