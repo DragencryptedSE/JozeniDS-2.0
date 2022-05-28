@@ -6,13 +6,19 @@ API Documentation can be found [here](https://github.com/DragencryptedSE/JozeniD
 ## Description
 It scans Instances under a folder, then serializes it to be stored into a Data Store.
 
+Structure:
+```
+DataSerializer \ -- ModuleScript
+    LoadData | -- ModuleScript
+    SaveData | -- ModuleScript
+```
+
 # Saving Features
 - Can save attributes.
 - Capable of saving any Instance from Roblox Studio's Insert Object widget. Everything, including scripts, meshparts.
 - Ability to manipulate data with ease, especially if using a DataStore editor plugin.
 - Retries support, in case of request failures.
 - Offline mode support.
-- Studio-only DataStore Scope support.
 
 # Use case examples
 Unique to 2.0:
