@@ -27,7 +27,7 @@ General unique purposes:
 # Instructions
 For setting up player data.
 
-For an in-depth guide, consider the wiki page: https://github.com/DragencryptedSE/JozeniDS-2.0/wiki
+For an in-depth guide, consider the wiki page: https://github.com/DragencryptedSE/JozeniDS-2.0/wiki/Tutorial
 
 1. Insert a folder named "PresetPlayerData" in ServerStorage. Insert as many objects as prefered under the folder, set their attributes and go crazy with it. During gameplay, this folder will be renamed to the folder name you set in the script. By default, the folder is renamed to "PlayerData" because it is in the settings of the script, so use `ServerStorage:WaitForChild("PlayerData")` in scripts. For the player's data, use `Player:WaitForChild("PlayerData")`.
 * However, for best results, this code sample will wait for the Player's data to be loaded, and it provides an attribute with the name of the folder:
