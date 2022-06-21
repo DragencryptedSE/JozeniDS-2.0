@@ -89,19 +89,21 @@ local function propTable(prop)
 			Data = UDim.new(prop.Scale, prop.Offset)
 		elseif prop.XU then
 			Data = UDim2.new(prop.XU.Scale, prop.XU.Offset, prop.YU.Scale, prop.YU.Offset)
+		elseif prop.EnumType then
+			Data = Enum[prop.EnumType][prop.Name]
 		elseif prop.AX ~= nil then
 			local props = {}
 			for i, v in pairs(prop) do
-				if type(v) == "string" then
-					table.insert(props, Enum.NormalId[v])
+				if type(v) == "table" then
+					table.insert(props, Enum[v.EnumItem][v.Name])
 				end
 			end
 			Data = Axes.new(table.unpack(props))
 		elseif prop.Top ~= nil then
 			local props = {}
 			for i, v in pairs(prop) do
-				if type(v) == "string" then
-					table.insert(props, Enum.NormalId[v])
+				if type(v) == "table" then
+					table.insert(props, Enum[v.EnumItem][v.Name])
 				end
 			end
 			Data = Faces.new(table.unpack(props))
@@ -209,7 +211,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					--Appearance
 					newObj.CastShadow = info.CastShadow
 					newObj.Color = propTable(info.Color)
-					newObj.Material = Enum.Material[info.Material]
+					newObj.Material = propTable(info.Material)
 					newObj.Reflectance = info.Reflectance
 					newObj.Transparency = info.Transparency
 					--Data
@@ -225,14 +227,14 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.RootPriority = info.RootPriority
 					newObj.Size = propTable(info.Size)
 					--Surface
-					newObj.TopSurface = Enum.SurfaceType[info.TopSurface]
-					newObj.BottomSurface = Enum.SurfaceType[info.BottomSurface]
-					newObj.FrontSurface = Enum.SurfaceType[info.FrontSurface]
-					newObj.BackSurface = Enum.SurfaceType[info.BackSurface]
-					newObj.LeftSurface = Enum.SurfaceType[info.LeftSurface]
-					newObj.RightSurface = Enum.SurfaceType[info.RightSurface]
+					newObj.TopSurface = propTable(info.TopSurface)
+					newObj.BottomSurface = propTable(info.BottomSurface)
+					newObj.FrontSurface = propTable(info.FrontSurface)
+					newObj.BackSurface = propTable(info.BackSurface)
+					newObj.LeftSurface = propTable(info.LeftSurface)
+					newObj.RightSurface = propTable(info.RightSurface)
 					if newObj:IsA("Part") then
-						newObj.Shape = Enum.PartType[info.Shape]
+						newObj.Shape = propTable(info.Shape)
 						if newObj:IsA("Seat") then
 							newObj.Disabled = info.Disabled
 						elseif newObj:IsA("SpawnLocation") then
@@ -251,7 +253,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 						newObj.Torque = info.Torque
 						newObj.TurnSpeed = info.TurnSpeed
 					elseif newObj:IsA("TrussPart") then
-						newObj.Style = Enum.Style[info.Style]
+						newObj.Style = propTable(info.Style)
 					elseif newObj:IsA("MeshPart") then
 						local mesh = nil
 						for i, v in pairs(ServerStorage:GetDescendants()) do
@@ -273,7 +275,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.Scale = propTable(info.Scale)
 				newObj.VertexColor = propTable(info.VertexColor)
 				if newObj:IsA("SpecialMesh") then
-					newObj.MeshType = Enum.MeshType[info.MeshType]
+					newObj.MeshType = propTable(info.MeshType)
 					newObj.MeshId = info.MeshId
 					newObj.TextureId = info.TextureId
 				end
@@ -294,7 +296,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				local surfaceAppearance = nil
 				for i, v in pairs(ServerStorage:GetDescendants()) do
 					if v:IsA("SurfaceAppearance") then
-						if v.AlphaMode == Enum.AlphaMode[info.AlphaMode] and v.ColorMap == info.ColorMap and v.MetalnessMap == info.MetalnessMap and v.NormalMap == info.NormalMap and v.RoughnessMap == info.RoughnessMap then
+						if v.AlphaMode == propTable(info.AlphaMode) and v.ColorMap == info.ColorMap and v.MetalnessMap == info.MetalnessMap and v.NormalMap == info.NormalMap and v.RoughnessMap == info.RoughnessMap then
 							surfaceAppearance = v
 							newObj = v:Clone()
 							newObj:ClearAllChildren()
@@ -308,12 +310,12 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 			elseif newObj:IsA("Accoutrement") then
 				newObj.AttachmentPoint = propTable(info.AttachmentPoint)
 				if newObj:IsA("Accessory") then
-					newObj.AccessoryType = Enum.AccessoryType[info.AccessoryType]
+					newObj.AccessoryType = propTable(info.AccessoryType)
 				end
 			elseif newObj:IsA("Camera") then
 				newObj.CFrame = propTable(info.CFrame)
 				setReference(newObj, parent, info.CameraSubject, "CameraSubject")
-				newObj.CameraType = Enum.CameraType[info.CameraType]
+				newObj.CameraType = propTable(info.CameraType)
 				newObj.DiagonalFieldOfView = info.DiagonalFieldOfView
 				newObj.FieldOfView = info.FieldOfView
 				newObj.FieldOfViewMode = info.FieldOfViewMode
@@ -327,12 +329,12 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.AutomaticScalingEnabled = info.AutomaticScalingEnabled
 				newObj.BreakJointsOnDeath = info.BreakJointsOnDeath
 				newObj.CameraOffset = propTable(info.CameraOffset)
-				newObj.DisplayDistanceType = Enum.HumanoidDisplayDistanceType[info.DisplayDistanceType]
+				newObj.DisplayDistanceType = propTable(info.DisplayDistanceType)
 				newObj.DisplayName = info.DisplayName
 				newObj.MaxHealth = info.MaxHealth
 				newObj.Health = info.Health
 				newObj.HealthDisplayDistance = info.HealthDisplayDistance
-				newObj.HealthDisplayType = Enum.HumanoidHealthDisplayType[info.HealthDisplayType]
+				newObj.HealthDisplayType = propTable(info.HealthDisplayType)
 				newObj.HipHeight = info.HipHeight
 				newObj.UseJumpPower = info.UseJumpPower
 				newObj.RequiresNeck = info.RequiresNeck
@@ -342,9 +344,9 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.MaxSlopeAngle = info.MaxSlopeAngle
 				newObj.TargetPoint = propTable(info.TargetPoint)
 				newObj.NameDisplayDistance = info.NameDisplayDistance
-				newObj.NameOcclusion = Enum.NameOcclusion[info.NameOcclusion]
+				newObj.NameOcclusion = propTable(info.NameOcclusion)
 				newObj.PlatformStand = info.PlatformStand
-				newObj.RigType = Enum.RigType[info.RigType]
+				newObj.RigType = propTable(info.RigType)
 				newObj.Sit = info.Sit
 				newObj.WalkToPoint = propTable(info.WalkToPoint)
 			elseif newObj:IsA("HumanoidDescription") then
@@ -438,25 +440,25 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.AutoLocalize = info.AutoLocalize
 				newObj.ClickablePrompt = info.ClickablePrompt
 				newObj.Enabled = info.Enabled
-				newObj.Exclusivity = Enum.ProximityPromptExclusivity[info.Exclusivity]
-				newObj.GamepadKeyCode = Enum.KeyCode[info.GamepadKeyCode]
+				newObj.Exclusivity = propTable(info.Exclusivity)
+				newObj.GamepadKeyCode = propTable(info.GamepadKeyCode)
 				newObj.HoldDuration = info.HoldDuration
-				newObj.KeyboardKeyCode = Enum.KeyCode[info.KeyboardKeyCode]
+				newObj.KeyboardKeyCode = propTable(info.KeyboardKeyCode)
 				newObj.MaxActivationDistance = info.MaxActivationDistance
 				newObj.ObjectText = info.ObjectText
 				newObj.RequiresLineOfSight = info.RequiresLineOfSight
 				setReference(newObj, parent, info.RootLocalizationTable, "RootLocalizationTable")
-				newObj.Style = Enum.ProximityPromptStyle[info.Style]
+				newObj.Style = propTable(info.Style)
 				newObj.UIOffset = propTable(info.UIOffset)
 			elseif newObj:IsA("Dialog") then
-				newObj.BehaviorType = Enum.DialogBehaviorType[info.BehaviorType]
+				newObj.BehaviorType = propTable(info.BehaviorType)
 				newObj.ConversationDistance = info.ConversationDistance
 				newObj.GoodbyeChoiceActive = info.GoodbyeChoiceActive
 				newObj.GoodbyeDialog = info.GoodbyeDialog
 				newObj.InUse = info.InUse
 				newObj.InitialPrompt = info.InitialPrompt
-				newObj.Purpose = Enum.DialogPurpose[info.Purpose]
-				newObj.Tone = Enum.DialogTone[info.Tone]
+				newObj.Purpose = propTable(info.Purpose)
+				newObj.Tone = propTable(info.Tone)
 				newObj.TriggerDistance = info.TriggerDistance
 				newObj.UIOffset = propTable(info.UIOffset)
 			elseif newObj:IsA("DialogChoice") then
@@ -474,7 +476,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.Playing = info.Playing
 				newObj.RollOffMaxDistance = info.RollOffMaxDistance
 				newObj.RollOffMinDistance = info.RollOffMinDistance
-				newObj.RollOffMode = Enum.RollOffMode[info.RollOffMode]
+				newObj.RollOffMode = propTable(info.RollOffMode)
 				newObj.SoundId = info.SoundId
 				setReference(newObj, parent, info.SoundGroup, "SoundGroup")
 				newObj.TimePosition = info.TimePosition
@@ -526,14 +528,14 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.Color = propTable(info.Color)
 				newObj.LightEmission = info.LightEmission
 				newObj.LightInfluence = info.LightInfluence
-				newObj.Orientation = Enum.ParticleOrientation[info.Orientation]
+				newObj.Orientation = propTable(info.Orientation)
 				newObj.Size = propTable(info.Size)
 				newObj.Squash = propTable(info.Squash)
 				newObj.Texture = info.Texture
 				newObj.Transparency = propTable(info.Transparency)
 				newObj.ZOffset = info.ZOffset
 				--Emission
-				newObj.EmissionDirection = Enum.NormalId[info.EmissionDirection]
+				newObj.EmissionDirection = propTable(info.EmissionDirection)
 				newObj.Enabled = info.Enabled
 				newObj.Lifetime = propTable(info.Lifetime)
 				newObj.Rate = info.Rate
@@ -542,9 +544,9 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.Speed = propTable(info.Speed)
 				newObj.SpreadAngle = propTable(info.SpreadAngle)
 				--EmitterShape
-				newObj.Shape = Enum.ParticleEmitterShape[info.Shape]
-				newObj.ShapeInOut = Enum.ParticleEmitterShapeInOut[info.ShapeInOut]
-				newObj.ShapeStyle = Enum.ParticleEmitterShapeStyle[info.ShapeStyle]
+				newObj.Shape = propTable(info.Shape)
+				newObj.ShapeInOut = propTable(info.ShapeInOut)
+				newObj.ShapeStyle = propTable(info.ShapeStyle)
 				--Motion
 				newObj.Acceleration = propTable(info.Acceleration)
 				--Particles
@@ -561,7 +563,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.LightInfluence = info.LightInfluence
 				newObj.Texture = info.Texture
 				newObj.TextureLength = info.TextureLength
-				newObj.TextureMode = Enum.TextureMode[info.TextureMode]
+				newObj.TextureMode = propTable(info.TextureMode)
 				newObj.TextureSpeed = info.TextureSpeed
 				newObj.Transparency = propTable(info.Transparency)
 				newObj.ZOffset = info.ZOffset
@@ -573,13 +575,13 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.Width0 = info.Width0
 				newObj.Width1 = info.Width1
 			elseif newObj:IsA("Explosion") then
-				newObj.BlastPreasure = info.BlastPreasure;
-				newObj.BlastRadius = info.BlastRadius;
-				newObj.DestroyJointRadiusPercent = info.DestroyJointRadiusPercent;
-				newObj.ExplosionType = Enum.ExplosionType[info.ExplosionType];
-				newObj.Position = propTable(info.Position);
-				newObj.TimeScale = info.TimeScale;
-				newObj.Visible = info.Visible;
+				newObj.BlastPreasure = info.BlastPreasure
+				newObj.BlastRadius = info.BlastRadius
+				newObj.DestroyJointRadiusPercent = info.DestroyJointRadiusPercent
+				newObj.ExplosionType = propTable(info.ExplosionType)
+				newObj.Position = propTable(info.Position)
+				newObj.TimeScale = info.TimeScale
+				newObj.Visible = info.Visible
 			elseif newObj:IsA("Fire") then
 				newObj.Color = propTable(info.Color);
 				newObj.Enabled = info.Enabled;
@@ -589,7 +591,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.TimeScale = info.TimeScale;
 			elseif newObj:IsA("Highlight") then
 				setReference(newObj, parent, info.Adornee, "Adornee")
-				newObj.DepthMode = Enum.HighlightDepthMode[info.DepthMode]
+				newObj.DepthMode = propTable(info.DepthMode)
 				newObj.Enabled = info.Enabled;
 				newObj.FillColor = propTable(info.FillColor);
 				newObj.FillTransparency = info.FillTransparency
@@ -610,20 +612,20 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 			elseif newObj:IsA("Trail") then
 				setReference(newObj, parent, info.Attachment0, "Attachment0")
 				setReference(newObj, parent, info.Attachment1, "Attachment1")
-				newObj.Brightness = info.Brightness;
-				newObj.Color = propTable(info.Color);
-				newObj.Enabled = info.Enabled;
-				newObj.FaceCamera = info.FaceCamera;
-				newObj.Lifetime = info.Lifetime;
-				newObj.LightEmission = info.LightEmission;
-				newObj.LightInfluence = info.LightInfluence;
-				newObj.MaxLength = info.MaxLength;
-				newObj.MinLength = info.MinLength;
-				newObj.Texture = info.Texture;
-				newObj.TextureLength = info.TextureLength;
-				newObj.TextureMode = Enum.TextureMode[info.TextureMode];
-				newObj.Transparency = propTable(info.Transparency);
-				newObj.WidthScale = propTable(info.WidthScale);
+				newObj.Brightness = info.Brightness
+				newObj.Color = propTable(info.Color)
+				newObj.Enabled = info.Enabled
+				newObj.FaceCamera = info.FaceCamera
+				newObj.Lifetime = info.Lifetime
+				newObj.LightEmission = info.LightEmission
+				newObj.LightInfluence = info.LightInfluence
+				newObj.MaxLength = info.MaxLength
+				newObj.MinLength = info.MinLength
+				newObj.Texture = info.Texture
+				newObj.TextureLength = info.TextureLength
+				newObj.TextureMode = propTable(info.TextureMode)
+				newObj.Transparency = propTable(info.Transparency)
+				newObj.WidthScale = propTable(info.WidthScale)
 			elseif newObj:IsA("Atmosphere") then
 				newObj.Color = propTable(info.Color)
 				newObj.Decay = propTable(info.Decay)
@@ -681,14 +683,14 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				elseif newObj:IsA("SurfaceLight") or newObj:IsA("SpotLight") then
 					newObj.Range = info.Range
 					newObj.Angle = info.Angle
-					newObj.Face = Enum.NormalId[info.Face]
+					newObj.Face = propTable(info.Face)
 				end
 			elseif newObj:IsA("Decal") then
 				newObj.Color3 = propTable(info.Color3)
 				newObj.Texture = info.Texture
 				newObj.Transparency = info.Transparency
 				newObj.ZIndex = info.ZIndex
-				newObj.Face = Enum.NormalId[info.Face]
+				newObj.Face = propTable(info.Face)
 				if newObj:IsA("Texture") then
 					newObj.OffsetStudsU = info.OffsetStudsU
 					newObj.OffsetStudsV = info.OffsetStudsV
@@ -756,11 +758,11 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				setReference(newObj, parent, info.Attachment0, "Attachment0")
 				setReference(newObj, parent, info.Attachment1, "Attachment1")
 				if newObj:IsA("AlignOrientation") then
-					newObj.AlignType = Enum.AlignType[info.AlignType]
+					newObj.AlignType = propTable(info.AlignType)
 					newObj.CFrame = propTable(info.CFrame)
 					newObj.MaxAngularVelocity = info.MaxAngularVelocity
 					newObj.MaxTorque = info.MaxTorque
-					newObj.Mode = Enum.OrientationAlignmentMode[info.Mode]
+					newObj.Mode = propTable(info.Mode)
 					newObj.PrimaryAxis = propTable(info.PrimaryAxis)
 					newObj.PrimaryAxisOnly = info.PrimaryAxisOnly
 					newObj.ReactionTorqueEnabled = info.ReactionTorqueEnabled
@@ -771,7 +773,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.ApplyAtCenterOfMass = info.ApplyAtCenterOfMass
 					newObj.MaxForce = info.MaxForce
 					newObj.MaxVelocity = info.MaxVelocity
-					newObj.Mode = Enum.PositionAlignmentMode[info.Mode]
+					newObj.Mode = propTable(info.Mode)
 					newObj.Position = propTable(info.Position)
 					newObj.ReactionForceEnabled = info.ReactionForceEnabled
 					newObj.Responsiveness = info.Responsiveness
@@ -780,7 +782,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.AngularVelocity = propTable(info.AngularVelocity)
 					newObj.MaxTorque = info.MaxTorque
 					newObj.ReactionTorqueEnabled = info.ReactionTorqueEnabled
-					newObj.RelativeTo = Enum.ActuatorRelativeTo[info.RelativeTo]
+					newObj.RelativeTo = propTable(info.RelativeTo)
 				elseif newObj:IsA("BallSocketConstraint") then
 					newObj.LimitsEnabled = info.LimitsEnabled
 					newObj.MaxFrictionTorque = info.MaxFrictionTorque
@@ -791,7 +793,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.TwistUpperAngle = info.TwistUpperAngle
 					newObj.UpperAngle = info.UpperAngle
 				elseif newObj:IsA("SlidingBallConstraint") then
-					newObj.ActuatorType = Enum.ActuatorType[info.ActuatorType]
+					newObj.ActuatorType = propTable(info.ActuatorType)
 					newObj.LimitsEnabled = info.LimitsEnabled
 					newObj.LinearResponsiveness = info.LinearResponsiveness
 					newObj.MotorMaxAcceleration = info.MotorMaxAcceleration
@@ -804,7 +806,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.UpperLimit = info.UpperLimit
 					newObj.Velocity = info.Velocity
 					if newObj:IsA("CylindricalConstraint") then
-						newObj.AngularActuatorType = Enum.ActuatorType[info.AngularActuatorType]
+						newObj.AngularActuatorType = propTable(info.AngularActuatorType)
 						newObj.AngularLimitsEnabled = info.AngularLimitsEnabled
 						newObj.AngularResponsiveness = info.AngularResponsiveness
 						newObj.AngularRestitution = info.AngularRestitution
@@ -820,7 +822,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 						newObj.UpperAngle = info.UpperAngle
 					end
 				elseif newObj:IsA("HingeConstraint") then
-					newObj.ActuatorType = Enum.ActuatorType[info.ActuatorType]
+					newObj.ActuatorType = propTable(info.ActuatorType)
 					newObj.AngularResponsiveness = info.AngularResponsiveness
 					newObj.AngularSpeed = info.AngularSpeed
 					newObj.AngularVelocity = info.AngularVelocity
@@ -839,10 +841,10 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.MaxForce = info.MaxForce
 					newObj.PlaneVelocity = propTable(info.PlaneVelocity)
 					newObj.PrimaryTangentAxis = propTable(info.PrimaryTangentAxis)
-					newObj.RelativeTo = Enum.ActuatorRelativeTo[info.RelativeTo]
+					newObj.RelativeTo = propTable(info.RelativeTo)
 					newObj.SecondaryTangentAxis = propTable(info.SecondaryTangentAxis)
 					newObj.VectorVelocity = propTable(info.VectorVelocity)
-					newObj.VelocityConstraintMode = Enum.VelocityConstraintMode[info.VelocityConstraintMode]
+					newObj.VelocityConstraintMode = propTable(info.VelocityConstraintMode)
 				elseif newObj:IsA("LineForce") then
 					newObj.ApplyAtCenterOfMass = info.ApplyAtCenterOfMass
 					newObj.InverseSquareLaw = info.InverseSquareLaw
@@ -880,7 +882,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.Stiffness = info.Stiffness
 					newObj.Thickness = info.Thickness
 				elseif newObj:IsA("Torque") then
-					newObj.RelativeTo = Enum.ActuatorRelativeTo[info.RelativeTo]
+					newObj.RelativeTo = propTable(info.RelativeTo)
 					newObj.Torque = propTable(info.Torque)
 				elseif newObj:IsA("TorsionSpringConstraint") then
 					newObj.Coils = info.Coils
@@ -899,7 +901,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				elseif newObj:IsA("VectorForce") then
 					newObj.ApplyAtCenterOfMass = info.ApplyAtCenterOfMass
 					newObj.Force = propTable(info.Force)
-					newObj.RelativeTo = Enum.ActuatorRelativeTo[info.RelativeTo]
+					newObj.RelativeTo = propTable(info.RelativeTo)
 				end
 			elseif newObj:IsA("NoCollisionConstraint") or newObj:IsA("WeldConstraint") then
 				newObj.Enabled = info.Enabled
@@ -913,7 +915,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				if newObj:IsA("LayerCollector") then
 					newObj.Enabled = info.Enabled
 					newObj.ResetOnRespawn = info.ResetOnRespawn
-					newObj.ZIndexBehavior = Enum.ZIndexBehavior[info.ZIndexBehavior]
+					newObj.ZIndexBehavior = propTable(info.ZIndexBehavior)
 					if newObj:IsA("ScreenGui") then
 						newObj.DisplayOrder = info.DisplayOrder
 						newObj.IgnoreGuiInset = info.IgnoreGuiInset
@@ -944,21 +946,21 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 						newObj.Brightness = info.Brightness
 						newObj.CanvasSize = propTable(info.CanvasSize)
 						newObj.ClipsDescendants = info.ClipsDescendants
-						newObj.Face = Enum.NormalId[info.Face]
+						newObj.Face = propTable(info.Face)
 						newObj.LightInfluence = info.LightInfluence
 						newObj.PixelsPerStud = info.PixelsPerStud
-						newObj.SizingMode = Enum.SurfaceGuiSizingMode[info.SizingMode]
+						newObj.SizingMode = propTable(info.SizingMode)
 						newObj.ToolPunchThroughDistance = info.ToolPunchThroughDistance
 						newObj.ZOffset = info.ZOffset
 					end
 				elseif newObj:IsA("GuiObject") then
 					newObj.Active = info.Active
 					newObj.AnchorPoint = propTable(info.AnchorPoint)
-					newObj.AutomaticSize = Enum.AutomaticSize[info.AutomaticSize]
+					newObj.AutomaticSize = propTable(info.AutomaticSize)
 					newObj.BackgroundColor3 = propTable(info.BackgroundColor3)
 					newObj.BackgroundTransparency = info.BackgroundTransparency
 					newObj.BorderColor3 = propTable(info.BorderColor3)
-					newObj.BorderMode = Enum.BorderMode[info.BorderMode]
+					newObj.BorderMode = propTable(info.BorderMode)
 					newObj.BorderSizePixel = info.BorderSizePixel
 					newObj.ClipsDescendants = info.ClipsDescendants
 					newObj.LayoutOrder = info.LayoutOrder
@@ -971,31 +973,31 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					newObj.Selectable = info.Selectable
 					setReference(newObj, parent, info.SelectionImageObject, "SelectionImageObject")
 					newObj.Size = propTable(info.Size)
-					newObj.SizeConstraint = Enum.SizeConstraint[info.SizeConstraint]
+					newObj.SizeConstraint = propTable(info.SizeConstraint)
 					newObj.Transparency = info.Transparency
 					newObj.Visible = info.Visible
 					newObj.ZIndex = info.ZIndex
 					if newObj:IsA("Frame") then
-						newObj.Style = Enum.FrameStyle[info.Style]
+						newObj.Style = propTable(info.Style)
 					elseif newObj:IsA("ScrollingFrame") then
-						newObj.AutomaticCanvasSize = Enum.AutomaticSize[info.AutomaticCanvasSize]
+						newObj.AutomaticCanvasSize = propTable(info.AutomaticCanvasSize)
 						newObj.BottomImage = info.BottomImage
 						newObj.CanvasPosition = propTable(info.CanvasPosition)
 						newObj.CanvasSize = propTable(info.CanvasSize)
-						newObj.ElasticBehavior = Enum.ElasticBehavior[info.ElasticBehavior]
-						newObj.HorizontalScrollBarInset = Enum.ScrollBarInset[info.HorizontalScrollBarInset]
+						newObj.ElasticBehavior = propTable(info.ElasticBehavior)
+						newObj.HorizontalScrollBarInset = propTable(info.HorizontalScrollBarInset)
 						newObj.MidImage = info.MidImage
 						newObj.ScrollBarImageColor3 = propTable(info.ScrollBarImageColor3)
 						newObj.ScrollBarImageTransparency = info.ScrollBarImageTransparency
 						newObj.ScrollBarThickness = info.ScrollBarThickness
 						newObj.ScrollVelocity = propTable(info.ScrollVelocity)
-						newObj.ScrollingDirection = Enum.ScrollingDirection[info.ScrollingDirection]
+						newObj.ScrollingDirection = propTable(info.ScrollingDirection)
 						newObj.ScrollingEnabled = info.ScrollingEnabled
 						newObj.TopImage = info.TopImage
-						newObj.VerticalScrollBarInset = Enum.ScrollBarInset[info.VerticalScrollBarInset]
-						newObj.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition[info.VerticalScrollBarPosition]
+						newObj.VerticalScrollBarInset = propTable(info.VerticalScrollBarInset)
+						newObj.VerticalScrollBarPosition = propTable(info.VerticalScrollBarPosition)
 					elseif newObj:IsA("TextLabel") or newObj:IsA("TextButton") then
-						newObj.Font = Enum.Font[info.Font]
+						newObj.Font = propTable(info.Font)
 						newObj.LineHeight = info.LineHeight
 						newObj.MaxVisibleGraphemes = info.MaxVisibleGraphemes
 						newObj.RichText = info.RichText
@@ -1006,14 +1008,14 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 						newObj.TextStrokeColor3 = propTable(info.TextStrokeColor3)
 						newObj.TextStrokeTransparency = info.TextStrokeTransparency
 						newObj.TextTransparency = info.TextTransparency
-						newObj.TextTruncate = Enum.TextTruncate[info.TextTruncate]
+						newObj.TextTruncate = propTable(info.TextTruncate)
 						newObj.TextWrapped = info.TextWrapped
-						newObj.TextXAlignment = Enum.TextXAlignment[info.TextXAlignment]
-						newObj.TextYAlignment = Enum.TextYAlignment[info.TextYAlignment]
+						newObj.TextXAlignment = propTable(info.TextXAlignment)
+						newObj.TextYAlignment = propTable(info.TextYAlignment)
 					elseif newObj:IsA("TextBox") then
 						newObj.ClearTextOnFocus = info.ClearTextOnFocus
 						newObj.CursorPosition = info.CursorPosition
-						newObj.Font = Enum.Font[info.Font]
+						newObj.Font = propTable(info.Font)
 						newObj.LineHeight = info.LineHeight
 						newObj.MaxVisibleGraphemes = info.MaxVisibleGraphemes
 						newObj.MultiLine = info.MultiLine
@@ -1029,18 +1031,18 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 						newObj.TextStrokeColor3 = propTable(info.TextStrokeColor3)
 						newObj.TextStrokeTransparency = info.TextStrokeTransparency
 						newObj.TextTransparency = info.TextTransparency
-						newObj.TextTruncate = Enum.TextTruncate[info.TextTruncate]
+						newObj.TextTruncate = propTable(info.TextTruncate)
 						newObj.TextWrapped = info.TextWrapped
-						newObj.TextXAlignment = Enum.TextXAlignment[info.TextXAlignment]
-						newObj.TextYAlignment = Enum.TextYAlignment[info.TextYAlignment]
+						newObj.TextXAlignment = propTable(info.TextXAlignment)
+						newObj.TextYAlignment = propTable(info.TextYAlignment)
 					elseif newObj:IsA("ImageLabel") then
 						newObj.Image = info.Image
 						newObj.ImageColor3 = propTable(info.ImageColor3)
 						newObj.ImageRectOffset = propTable(info.ImageRectOffset)
 						newObj.ImageRectSize = propTable(info.ImageRectSize)
 						newObj.ImageTransparency = info.ImageTransparency
-						newObj.ResampleMode = Enum.ResamplerMode[info.ResampleMode]
-						newObj.ScaleType = Enum.ScaleType[info.ScaleType]
+						newObj.ResampleMode = propTable(info.ResampleMode)
+						newObj.ScaleType = propTable(info.ScaleType)
 						newObj.SliceCenter = propTable(info.SliceCenter)
 						newObj.SliceScale = info.SliceScale
 						newObj.TileSize = propTable(info.TileSize)
@@ -1052,8 +1054,8 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 						newObj.ImageRectSize = propTable(info.ImageRectSize)
 						newObj.ImageTransparency = info.ImageTransparency
 						newObj.PressedImage = info.PressedImage
-						newObj.ResampleMode = Enum.ResamplerMode[info.ResampleMode]
-						newObj.ScaleType = Enum.ScaleType[info.ScaleType]
+						newObj.ResampleMode = propTable(info.ResampleMode)
+						newObj.ScaleType = propTable(info.ScaleType)
 						newObj.SliceCenter = propTable(info.SliceCenter)
 						newObj.SliceScale = info.SliceScale
 						newObj.TileSize = propTable(info.TileSize)
@@ -1082,14 +1084,14 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 						newObj.Axes = propTable(info.Axes)
 					elseif newObj:IsA("Handles") then
 						newObj.Faces = propTable(info.Faces)
-						newObj.Style = Enum.HandlesStyle[info.Style]
+						newObj.Style = propTable(info.Style)
 					elseif newObj:IsA("SurfaceSelection") then
-						newObj.TargetSurface = Enum.NormalId[info.TargetSurface]
+						newObj.TargetSurface = propTable(info.TargetSurface)
 					end
 				elseif newObj:IsA("PVAdornment") then
 					setReference(newObj, parent, info.Adornee, "Adornee")
 					if newObj:IsA("HandleAdornment") then
-						newObj.AdornCullingMode = Enum.AdornCullingMode[info.AdornCullingMode]
+						newObj.AdornCullingMode = propTable(info.AdornCullingMode)
 						newObj.AlwaysOnTop = info.AlwaysOnTop
 						newObj.CFrame = propTable(info.CFrame)
 						newObj.SizeRelativeOffset = propTable(info.SizeRelativeOffset)
@@ -1132,8 +1134,8 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.PassThrough = info.PassThrough
 			elseif newObj:IsA("UIAspectRatioConstraint") then
 				newObj.AspectRatio = info.AspectRatio
-				newObj.AspectType = Enum.AspectType[info.AspectType]
-				newObj.DominantAxis = Enum.DominantAxis[info.DominantAxis]
+				newObj.AspectType = propTable(info.AspectType)
+				newObj.DominantAxis = propTable(info.DominantAxis)
 			elseif newObj:IsA("UICorner") then
 				newObj.CornerRadius = propTable(info.CornerRadius)
 			elseif newObj:IsA("UIGradient") then
@@ -1143,22 +1145,22 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.Rotation = info.Rotation
 				newObj.Transparency = propTable(info.Transparency)
 			elseif newObj:IsA("UIGridStyleLayout") then
-				newObj.FillDirection = Enum.FillDirection[info.FillDirection]
-				newObj.HorizontalAlignment = Enum.HorizontalAlignment[info.HorizontalAlignment]
-				newObj.SortOrder = Enum.SortOrder[info.SortOrder]
-				newObj.VerticalAlignment = Enum.VerticalAlignment[info.VerticalAlignment]
+				newObj.FillDirection = propTable(info.FillDirection)
+				newObj.HorizontalAlignment = propTable(info.HorizontalAlignment)
+				newObj.SortOrder = propTable(info.SortOrder)
+				newObj.VerticalAlignment = propTable(info.VerticalAlignment)
 				if newObj:IsA("UIGridLayout") then
 					newObj.CellPadding = propTable(info.CellPadding)
 					newObj.CellSize = propTable(info.CellSize)
 					newObj.FillDirectionMaxCells = info.FillDirectionMaxCells
-					newObj.StartCorner = Enum.StartCorner[info.StartCorner]
+					newObj.StartCorner = propTable(info.StartCorner)
 				elseif newObj:IsA("UIListLayout") then
 					newObj.Padding = propTable(info.Padding)
 				elseif newObj:IsA("UIPageLayout") then
 					newObj.Animated = info.Animated
 					newObj.Circular = info.Circular
-					newObj.EasingDirection = Enum.EasingDirection[info.EasingDirection]
-					newObj.EasingStyle = Enum.EasingStyle[info.EasingStyle]
+					newObj.EasingDirection = propTable(info.EasingDirection)
+					newObj.EasingStyle = propTable(info.EasingStyle)
 					newObj.GamepadInputEnabled = info.GamepadInputEnabled
 					newObj.Padding = propTable(info.Padding)
 					newObj.ScrollWheelInputEnabled = info.ScrollWheelInputEnabled
@@ -1167,7 +1169,7 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				elseif newObj:IsA("UITableLayout") then
 					newObj.FillEmptySpaceColumns = info.FillEmptySpaceColumns
 					newObj.FillEmptySpaceRows = info.FillEmptySpaceRows
-					newObj.MajorAxis = Enum.TableMajorAxis[info.MajorAxis]
+					newObj.MajorAxis = propTable(info.MajorAxis)
 					newObj.Padding = propTable(info.Padding)
 				end
 			elseif newObj:IsA("UIPadding") then
@@ -1181,10 +1183,10 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 				newObj.MaxSize = propTable(info.MaxSize)
 				newObj.MinSize = propTable(info.MinSize)
 			elseif newObj:IsA("UIStroke") then
-				newObj.ApplyStrokeMode = Enum.ApplyStrokeMode[info.ApplyStrokeMode]
+				newObj.ApplyStrokeMode = propTable(info.ApplyStrokeMode)
 				newObj.Color = propTable(info.Color)
 				newObj.Enabled = info.Enabled
-				newObj.LineJoinMode = Enum.LineJoinMode[info.LineJoinMode]
+				newObj.LineJoinMode = propTable(info.LineJoinMode)
 				newObj.Thickness = info.Thickness
 				newObj.Transparency = info.Transparency
 			elseif newObj:IsA("UITextSizeConstraint") then
