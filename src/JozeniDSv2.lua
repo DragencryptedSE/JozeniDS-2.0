@@ -274,7 +274,7 @@ local DataSerializer = {
 
 local fileName = "PlayerData"
 local isSavingName = "IsSavingData"
-local loadedName = "DataStoreLoaded"
+local loadedName = "DSLoaded"
 local retryCount = 3
 local retryWait = 2
 
