@@ -336,13 +336,14 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 					if v:IsA("SurfaceAppearance") then
 						if v.AlphaMode == propTable(info.AlphaMode) and v.ColorMap == info.ColorMap and v.MetalnessMap == info.MetalnessMap and v.NormalMap == info.NormalMap and v.RoughnessMap == info.RoughnessMap then
 							surfaceAppearance = v
+							newObj:Destroy()
 							newObj = v:Clone()
 							newObj:ClearAllChildren()
 
 							newObj.Archivable = info.Archivable
 							newObj.Name = info.Name
 							setAttributes(newObj, info)
-							
+
 							break
 						end
 					end
