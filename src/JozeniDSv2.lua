@@ -61,8 +61,8 @@ print("Jozeni00\'s Data Serializer 2.0 loaded.")
 
 	*void* DataStore:Update(plr: Player, key: string)
 	Serializes the folder, then sends it to the Data Store.
-	plr:SetAttribute("IsSavingData", true) is called first, while DataStore is updating data.
-	plr:SetAttribute("IsSavingData", false) is called after the DataStore finishes updating data.
+	plr:SetAttribute("IsSaving", true) is called first, while DataStore is updating data.
+	plr:SetAttribute("IsSaving", false) is called after the DataStore finishes updating data.
 
 	plr: player
 	Key: string
@@ -70,8 +70,8 @@ print("Jozeni00\'s Data Serializer 2.0 loaded.")
 	*void* DataStore:CleanUpdate(plr: Player, key: string)
 	Serializes the folder, then sends it to the Data Store. Also, cleans up debris.
 		This is only recommended to use when the player leaves.
-	plr:SetAttribute("IsSavingData", true) is called first, while DataStore is updating data.
-	plr:SetAttribute("IsSavingData", false) is called after the DataStore finishes updating data.
+	plr:SetAttribute("IsSaving", true) is called first, while DataStore is updating data.
+	plr:SetAttribute("IsSaving", false) is called after the DataStore finishes updating data.
 
 	plr: player
 	Key: string
@@ -270,16 +270,13 @@ local ServerStorage = game:GetService("ServerStorage")
 local DataStoreService = game:GetService("DataStoreService")
 local DataSerializer = {
 	["DataStores"] = {};
+	["FileName"] = "PlayerData"; -- new name of PresetPlayerData when it gets cloned to the Player. 
+	["LoadedName"] = "DSLoaded"; -- name of attribute that fires on player when PlayerData is loaded
+	["IsSavingName"] = "IsSaving"; -- name of attribute that fires on player when data is saving
+	["RetryCount"] = 3; -- number of failed save attempts before cancelling
+	["RetryDelay"] = 2; -- time (in seconds) between failed save attempts
+	["DebugInfo"] = true; -- show aditional save details when a player saves data
 }
-
-local fileName = "PlayerData"
-local isSavingName = "IsSavingData"
-local loadedName = "DSLoaded"
-local retryCount = 3
-local retryWait = 2
-
-local defaultRetry = 3
-local defaultWait = 2
 
 --make folders
 local DataTempFile = ReplicatedStorage:FindFirstChild("DataTempFile")
@@ -292,9 +289,9 @@ end
 local PresetPlayerData = ServerStorage:FindFirstChild("PresetPlayerData")
 if not PresetPlayerData then
 	PresetPlayerData = Instance.new("Folder")
+	PresetPlayerData.Name = "PresetPlayerData"
 	PresetPlayerData.Parent = ServerStorage
 end
-PresetPlayerData.Name = fileName
 
 function DataSerializer:GetStore(name, options)
 	if not name then
@@ -314,31 +311,29 @@ function DataSerializer:GetStore(name, options)
 
 		if not success then
 			print(DataStoreResult)
-			DataSerializer.DataStores[name] = nil
-			return nil
 		end
 
 		--functions
 		function DataStore:Get(plr, key, userids, dataOptions)
 			--check for loaded data
 			local PlayerData = nil
-			if plr:GetAttribute(loadedName) then
-				PlayerData = plr:FindFirstChild(plr:GetAttribute(loadedName))
+			if plr:GetAttribute(DataSerializer.LoadedName) then
+				PlayerData = plr:FindFirstChild(plr:GetAttribute(DataSerializer.LoadedName))
 			else
 				PlayerData = PresetPlayerData:Clone()
-				PlayerData.Name = fileName
+				PlayerData.Name = DataSerializer.FileName
 				PlayerData.Parent = plr
-			end
 
-			for i, v in pairs(PlayerData:GetDescendants()) do
-				if v:IsA("ObjectValue") then
-					if v.Value then
-						--clone object
-						local newObject = v.Value:Clone()
-						newObject.Parent = DataTempFile
-
-						--set new value
-						v.Value = newObject
+				for i, v in pairs(PlayerData:GetDescendants()) do
+					if v:IsA("ObjectValue") then
+						if v.Value then
+							--clone object
+							local newObject = v.Value:Clone()
+							newObject.Parent = DataTempFile
+	
+							--set new value
+							v.Value = newObject
+						end
 					end
 				end
 			end
@@ -349,7 +344,7 @@ function DataSerializer:GetStore(name, options)
 
 			if GlobalDataStore then
 
-				for i = 0, retryCount do
+				for i = 0, DataSerializer.RetryCount do
 					local success, DataResult, info = pcall(function()
 						--get data
 						local Data, keyInfo = GlobalDataStore:GetAsync(key)
@@ -378,7 +373,7 @@ function DataSerializer:GetStore(name, options)
 							print(plr.Name .. " loaded in without Data Store API access.")
 							break
 						else
-							if i == retryCount then
+							if i == DataSerializer.RetryCount then
 								warn(DataResult)
 								plr:Kick("Internal server error, please rejoin.")
 								break
@@ -386,29 +381,29 @@ function DataSerializer:GetStore(name, options)
 						end
 					end
 
-					task.wait(retryWait)
+					task.wait(DataSerializer.RetryDelay)
 				end
 			else
 				print(plr.Name .. " loaded in offline mode.")
 			end
 
-			plr:SetAttribute(loadedName, fileName)
+			plr:SetAttribute(DataSerializer.LoadedName, DataSerializer.FileName)
 			return PlayerData, data, keyInfo
 		end
 
 		function DataStore:Update(plr, key)
 			local GlobalDataStore = DataStore.GlobalDataStore
-			if GlobalDataStore and plr:GetAttribute(loadedName) and not plr:GetAttribute(isSavingName) then
-				plr:SetAttribute(isSavingName, true)
+			if GlobalDataStore and plr:GetAttribute(DataSerializer.LoadedName) and not plr:GetAttribute(DataSerializer.IsSavingName) then
+				plr:SetAttribute(DataSerializer.IsSavingName, true)
 
 				--player data
-				local PlayerData = plr:FindFirstChild(fileName)
+				local PlayerData = plr:FindFirstChild(DataSerializer.FileName)
 				local serialize = SaveModule:CompileDataTable(PlayerData)
 
 				local maxCache = 4000000 -- Max data is 4,000,000
 				local dataCache = HttpService:JSONEncode(serialize)
 
-				for i = 0, retryCount do
+				for i = 0, DataSerializer.RetryCount do
 
 					--update data
 					local success, result = pcall(function()
@@ -423,37 +418,41 @@ function DataSerializer:GetStore(name, options)
 
 					if not success then
 						--if failed
-						if i == retryCount then
+						if i == DataSerializer.RetryCount then
 							warn(result)
 							break
 						end
 					else
-						--print results
-						print(plr.Name .. " saved:")
-						print(fileName, serialize)
-						print("Cache:", #dataCache .. " /" .. maxCache)
-						if #dataCache > maxCache then
-							warn("Cache exceeds limit, data may throttle.")
+						if DataSerializer.DebugInfo then
+							--print results
+							print(plr.Name .. " saved:")
+							print(DataSerializer.FileName, serialize)
+							print("Cache:", #dataCache .. " /" .. maxCache)
+							if #dataCache > maxCache then
+								warn("Cache exceeds limit, data may throttle.")
+							end
+							print("Key: " .. key)
+						else
+							print(plr.Name .. " successfully updated.")
 						end
-						print("Key: " .. key)
 						break
 					end
 
-					task.wait(retryWait)
+					task.wait(DataSerializer.RetryDelay)
 				end
 
 				--task.wait(6)
-				plr:SetAttribute(isSavingName, false)
+				plr:SetAttribute(DataSerializer.IsSavingName, false)
 			end
 		end
 
 		--the final save
 		function DataStore:CleanUpdate(plr, key)
 
-			local timeToRemove = retryCount * retryWait
+			local timeToRemove = DataSerializer.RetryCount * DataSerializer.RetryDelay + 2
 
-			if plr:GetAttribute(loadedName) then
-				local PlayerData = plr:FindFirstChild(fileName)
+			if plr:GetAttribute(DataSerializer.LoadedName) then
+				local PlayerData = plr:FindFirstChild(DataSerializer.FileName)
 
 				for i, v in pairs(PlayerData:GetDescendants()) do
 					if v:IsA("ObjectValue") then
@@ -471,7 +470,7 @@ function DataSerializer:GetStore(name, options)
 		function DataStore:Remove(key)
 			local GlobalDataStore = DataStore.GlobalDataStore
 
-			for i = 0, retryCount do
+			for i = 0, DataSerializer.RetryCount do
 
 				--update data
 				local success, result, keyInfo = pcall(function()
@@ -481,7 +480,7 @@ function DataSerializer:GetStore(name, options)
 
 				if not success then
 					--if failed
-					if i == retryCount then
+					if i == DataSerializer.RetryCount then
 						warn(result)
 						return nil
 					end
@@ -492,7 +491,7 @@ function DataSerializer:GetStore(name, options)
 					return result, keyInfo
 				end
 
-				task.wait(retryWait)
+				task.wait(DataSerializer.RetryDelay)
 			end
 		end
 	end
@@ -510,28 +509,6 @@ function DataSerializer:ListStores()
 	end
 
 	return list
-end
-
-function DataSerializer:SetRetries(retries, cool)
-	--set retries
-	if retries and type(retries) == "number" then
-		if retries < 1 then
-			retries = 1
-		end
-		retryCount = math.floor(retries)
-	else
-		retryCount = defaultRetry
-	end
-
-	--set cooldown
-	if cool and type(cool) == "number" then
-		if cool < 1 then
-			cool = 1
-		end
-		retryWait = math.floor(cool)
-	else
-		retryWait = defaultWait
-	end
 end
 
 return DataSerializer
