@@ -87,6 +87,20 @@ local function saveAttributes(obj)
 						["Value"] = math.floor(p.Value * 1000)/1000;
 					}
 				end
+			elseif typeof(v) == "Font" then
+				local weight = tostring(v.Weight):split(".")
+				local style = tostring(v.Style):split(".")
+				attributes[i] = {
+					["Family"] = v.Family;
+					["Weight"] = {
+						["EnumType"] = weight[2];
+						["Name"] = weight[3];
+					};
+					["Style"] = {
+						["EnumType"] = style[2];
+						["Name"] = style[3];
+					};
+				};
 			end
 		end
 	end
