@@ -262,8 +262,43 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 							if v:IsA("MeshPart") then
 								if v.MeshId == info.MeshId and v.DoubleSided == info.DoubleSided and v.RenderFidelity == propTable(info.RenderFidelity) and v.CollisionFidelity == propTable(info.CollisionFidelity) then
 									mesh = v
-									newObj:ApplyMesh(v)
+									newObj:Destroy()
+									newObj = v:Clone()
+									newObj:ClearAllChildren()
+
+									newObj.Archivable = info.Archivable
+									newObj.Name = info.Name
+									setAttributes(newObj, info)
+
+									--Appearance
+									newObj.CastShadow = info.CastShadow
+									newObj.Color = propTable(info.Color)
+									newObj.Material = propTable(info.Material)
+									newObj.Reflectance = info.Reflectance
+									newObj.Transparency = info.Transparency
+									--Data
+									newObj.Locked = info.Locked
+									newObj.CFrame = propTable(info.CFrame)
+									--Collision
+									newObj.CanCollide = info.CanCollide
+									newObj.CanTouch = info.CanTouch
+									newObj.CollisionGroupId = info.CollisionGroupId
+									--Behavior
+									newObj.Anchored = info.Anchored
+									newObj.Massless = info.Massless
+									newObj.RootPriority = info.RootPriority
+									newObj.Size = propTable(info.Size)
+									--Surface
+									newObj.TopSurface = propTable(info.TopSurface)
+									newObj.BottomSurface = propTable(info.BottomSurface)
+									newObj.FrontSurface = propTable(info.FrontSurface)
+									newObj.BackSurface = propTable(info.BackSurface)
+									newObj.LeftSurface = propTable(info.LeftSurface)
+									newObj.RightSurface = propTable(info.RightSurface)
+
+									--texture
 									newObj.TextureID = info.TextureID
+
 									break
 								end
 							end
@@ -303,12 +338,17 @@ local function scanObjects(plr, parent, data, primarypart, objVal)
 							surfaceAppearance = v
 							newObj = v:Clone()
 							newObj:ClearAllChildren()
+
+							newObj.Archivable = info.Archivable
+							newObj.Name = info.Name
+							setAttributes(newObj, info)
+							
 							break
 						end
 					end
 				end
 				if not surfaceAppearance then
-					warn("SurfaceAppearance: " .. newObj.Name .. " with: n\AlphaMode: " .. info.AlphaMode .. " n\ColorMap: " .. info.ColorMap .. " n\MetalnessMap: " .. info.MetalnessMap .. " n\NormalMap: " .. info.NormalMap .. " n\RoughnessMap: " .. info.RoughnessMap .. " n\has not been found in ServerStorage." )
+					warn("SurfaceAppearance: " .. newObj.Name .. " with: \nAlphaMode: " .. info.AlphaMode .. " \nColorMap: " .. info.ColorMap .. " \nMetalnessMap: " .. info.MetalnessMap .. " \nNormalMap: " .. info.NormalMap .. " \nRoughnessMap: " .. info.RoughnessMap .. " \nhas not been found in ServerStorage." )
 				end
 			elseif newObj:IsA("Accoutrement") then
 				newObj.AttachmentPoint = propTable(info.AttachmentPoint)
